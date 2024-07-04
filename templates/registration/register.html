@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar - Apoio Saúde</title>
     <link rel="stylesheet" href="{% static 'css/register.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo.png' %}">
 </head>
 <body>
     <div class="register-container">
@@ -117,7 +118,7 @@
                     dynamicForm.innerHTML = getFamiliarForm();
                 }
 
-                // Esconder o campo Relação com Paciente se o tipo de usuário não for Familiar
+                
                 if (userType === 'cuidador') {
                     var relacaoComPacienteField = document.getElementById('relacao-com-paciente');
                     if (relacaoComPacienteField) {
@@ -129,7 +130,7 @@
             document.getElementById('id_user_type').addEventListener('change', toggleForms);
             window.onload = toggleForms;
 
-            // Validação e exibição de ajuda da senha
+           
             const passwordField1 = document.getElementById('id_password1');
             const passwordField2 = document.getElementById('id_password2');
             const helpText1 = document.getElementById('password-help-1');
@@ -162,11 +163,11 @@
 
             function validatePassword1(password) {
                 const criteria = [
-                    /.{8,}/, // Pelo menos 8 caracteres
-                    /.*[A-Z].*/, // Pelo menos uma letra maiúscula
-                    /.*[a-z].*/, // Pelo menos uma letra minúscula
-                    /.*[0-9].*/, // Pelo menos um número
-                    /.*[^A-Za-z0-9].*/ // Pelo menos um caractere especial
+                    /.{8,}/, 
+                    /.*[A-Z].*/, 
+                    /.*[a-z].*/, 
+                    /.*[0-9].*/, 
+                    /.*[^A-Za-z0-9].*/ 
                 ];
 
                 criteria.forEach((regex, index) => {

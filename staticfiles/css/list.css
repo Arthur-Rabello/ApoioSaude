@@ -1,0 +1,229 @@
+body {
+    font-family: Arial, sans-serif;
+    background-image: url("/static/img/fundo_tela.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+h1 {
+    color: #232EB8;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.notes-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.note-card {
+    background-color: #F2EE8A;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.note-header {
+    display: flex;
+    color: #3D3D3D;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    text-transform: capitalize;
+}
+
+.note-content {
+    color: #3D3D3D;
+    margin-bottom: 10px;
+}
+
+.note-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.medications-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.medication-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+
+
+.medication-header {
+    display: flex;
+    color: #202020;
+    margin-top: -20px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.medication-content {
+    color: #202020;
+}
+
+.medication-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.medication-content p {
+    margin: 5px 0;
+}
+
+.consultations-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.consultation-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.consultation-header {
+    display: flex;
+    color: #202020;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.consultation-content {
+    color: #202020;
+}
+
+.consultation-content p {
+    margin: 5px 0;
+}
+
+.consultation-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #333;
+    margin-top: 3px;
+    margin-bottom: 10px;
+}
+
+.authorized-users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.user-category {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid #ccc;
+}
+
+.user-category ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.user-category li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.user-category li:last-child {
+    border-bottom: none;
+}
+
+.patients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.patient-card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+.patient-card:hover {
+    transform: scale(1.02);
+}
+.patient-photo {
+    margin-right: 20px;
+}
+
+.patient-photo img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.patient-info {
+    flex-grow: 1;
+}
+
+.patient-info h2{
+    margin: 0;
+    font-size: 24px;
+    color: #202020;
+    text-decoration: none;
+}
+
+.patient-info p {
+    margin: 5px 0 0;
+    color: #757575;
+}
+.patient-card a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+    height: 100%;
+}

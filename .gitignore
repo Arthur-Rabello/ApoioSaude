@@ -74,6 +74,7 @@ coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
+media
 
 # Translations
 *.mo
@@ -81,4 +82,3 @@ coverage.xml
 # System files
 desktop.ini
 
-apoiosaudeweb/media

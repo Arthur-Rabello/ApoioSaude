@@ -199,26 +199,30 @@ class PacienteDetailView(LoginRequiredMixin, AllRequiredMixin, DetailView):
 
 @login_required
 def create_paciente(request):
-    if request.method == 'POST':
-        form = PacienteForm(request.POST, request.FILES)
-        if form.is_valid():
-            paciente = form.save()
-            user_role = request.user.user_type
-            if user_role == 'familiar':
-                familiar = Familiar.objects.get(user=request.user)
-                familiar.is_admin = True  # Definindo como admin
-                familiar.relacao_com_paciente = request.POST.get('relacao_com_paciente')
-                familiar.pacientes.add(paciente)
-                familiar.save()
-            elif user_role == 'cuidador':
-                familiar = Familiar.objects.get(user=request.user)
-                familiar.is_admin = True  # Definindo como admin
-                familiar.relacao_com_paciente = request.user.user_type
-                familiar.pacientes.add(paciente)
-                familiar.save()
-            return redirect('index')
+        
+    if request.user.user_type != 'medico':
+        if request.method == 'POST':
+            form = PacienteForm(request.POST, request.FILES)
+            if form.is_valid():
+                paciente = form.save()
+                user_role = request.user.user_type
+                if user_role == 'familiar':
+                    familiar = Familiar.objects.get(user=request.user)
+                    familiar.is_admin = True  # Definindo como admin
+                    familiar.relacao_com_paciente = request.POST.get('relacao_com_paciente')
+                    familiar.pacientes.add(paciente)
+                    familiar.save()
+                elif user_role == 'cuidador':
+                    familiar = Familiar.objects.get(user=request.user)
+                    familiar.is_admin = True  # Definindo como admin
+                    familiar.relacao_com_paciente = request.user.user_type
+                    familiar.pacientes.add(paciente)
+                    familiar.save()
+                return redirect('index')
+        else:
+            form = PacienteForm()
     else:
-        form = PacienteForm()
+        return redirect('permission_denied')
     return render(request, 'pacientes/paciente_form.html', {'form': form})
 
 @login_required
@@ -464,8 +468,8 @@ class ConsultaDeleteView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,Dele
     template_name = 'consultas/consulta_confirm_delete.html'
     success_url = reverse_lazy('consulta_list')
 
-def permission_denied_view(request, exception=None):
-    return render(request, 'errors/permission_denied.html', status=403)
+def permission_denied_view(request):
+    return render(request, 'permission_denied.html')
 
 @login_required
 def delete_profile(request, user_id):

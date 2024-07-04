@@ -5,9 +5,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
 from .views import register, login, perfil_generico, resend_verification_email, verify_email, editar_perfil, error_404_view, autorizado_list_view, error_500_view, logout_view, autorizacao_acesso, delete_profile, permission_denied_view, remover_autorizacao
-handler404 = 'apoiosaudeweb.views.error_404_view'
-handler500 = 'apoiosaudeweb.views.error_500_view'
-handler403 = 'apoiosaudeweb.views.permission_denied_view'
+
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -66,5 +64,3 @@ urlpatterns = [
     path('consultas/<int:pk>/update/', views.ConsultaUpdateView.as_view(), name='consulta_update'),
     path('consultas/<int:pk>/delete/', views.ConsultaDeleteView.as_view(), name='consulta_delete'),
 ]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

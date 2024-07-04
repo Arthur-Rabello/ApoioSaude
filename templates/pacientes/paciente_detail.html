@@ -5,11 +5,11 @@
     <title>Detalhes do Paciente</title>
     <link rel="stylesheet" href="{% static 'css/detail.css' %}">
     <link rel="stylesheet" href="{% static 'css/button.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo.png' %}">
 </head>
 <body>
     <div class="content">
         <div class="header">
-            
             {% if object.foto_perfil %}
                 <img src="{{ object.foto_perfil.url }}" alt="Foto de perfil de {{ object.nome }}" style="height: 11rem; margin: 0 auto 20px auto; display: block; border-radius: 10px;" >
             {% else %}

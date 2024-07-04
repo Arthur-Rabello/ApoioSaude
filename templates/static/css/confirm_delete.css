@@ -1,0 +1,43 @@
+body {
+    background-image: url("/static/img/fundo_tela.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    color: #1a3d7c;
+    margin-bottom: 1rem;
+}
+
+p {
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+
+a {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #1a3d7c;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

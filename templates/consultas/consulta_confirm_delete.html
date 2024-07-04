@@ -1,15 +1,24 @@
+{% load static%}
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Deletar Consulta</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="{% static 'css/button.css' %}">
+    <link rel="stylesheet" href="{% static 'css/confirm_delete.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo.png' %}">
 </head>
 <body>
-    <h1>Deletar Consulta</h1>
-    <p>Tem certeza que deseja deletar esta consulta?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Deletar</button>
-    </form>
-    <a href="{% url 'consulta_list' %}">Voltar à Lista</a>
+    <div class="container">
+        <h1>Deletar Consulta</h1>
+        <p>Tem certeza que deseja deletar esta consulta?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-delete">Deletar</button>
+        </form>
+        <button onclick="window.location.href='{% url 'consulta_list' %}'" class="btn btn-secondary">Voltar à Lista</button>
+    </div>
 </body>
 </html>
