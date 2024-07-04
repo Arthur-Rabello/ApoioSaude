@@ -22,6 +22,15 @@ Clone o repositório do projeto "Apoio Saúde":
 git clone https://github.com/seu-usuario/apoio-saude.git
 cd apoio-saude
 ```
+
+### Configuração da .ENV
+
+Duplique o arquivo `.env.example` e faça alterações caso necessário.
+
+```bash
+cp .env.example .env
+```
+
 ### Inicialização do Ambiente Virtual (venv)
 
 Crie um ambiente virtual para isolar as dependências do seu projeto. No terminal, navegue até o diretório do projeto e execute o seguinte comando:
