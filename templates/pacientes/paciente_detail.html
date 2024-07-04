@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalhes do Paciente</title>
+    <link rel="stylesheet" href="{% static 'css/detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/button.css' %}">
+</head>
+<body>
+    <div class="content">
+        <div class="header">
+            
+            {% if object.foto_perfil %}
+                <img src="{{ object.foto_perfil.url }}" alt="Foto de perfil de {{ object.nome }}" style="height: 11rem; margin: 0 auto 20px auto; display: block; border-radius: 10px;" >
+            {% else %}
+                <p>Sem foto de perfil.</p>
+            {% endif %}
+            <h1>{{ object.nome }}</h1>
+        </div>
+        <div class="info">
+            <p>Idade: {{ object.calcular_idade }}</p>
+            <p>Data de Nascimento: {{ object.data_nascimento|date:"d/m/Y" }}</p>
+            <p>Tipo Sanguíneo: {{ object.tipo_sanguineo }}</p>
+            <p>Doença(s): {{ object.doenca }}</p>
+            <p>Outros Dados: {{ object.outros_dados }}</p>
+        </div>
+        <div class="button-group">
+            <button onclick="window.location.href='{% url 'paciente_list' %}'" class="btn btn-secondary">Voltar à Lista</button>
+            <button onclick="window.location.href='{% url 'paciente_update' object.id %}'" class="btn btn-primary">Editar</button>
+            <button onclick="window.location.href='{% url 'paciente_delete' object.id %}'" class="btn btn-delete">Deletar</button>
+        </div>
+    </div>
+</body>
+</html>

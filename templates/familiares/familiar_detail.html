@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalhes do Familiar</title>
+    <link rel="stylesheet" href="{% static 'css/detail.css' %}">
+</head>
+<body>
+    <h1>Familiar</h1>
+    <p>Nome: {{ object.nome }}</p>
+    <p>Relação com o Paciente: {{ object.relacao_com_paciente }}</p>
+    <p>Informações de Contato: {{ object.informacoes_contato }}</p>
+    <a href="{% url 'familiar_update' object.id %}" class="button">Editar</a>
+    <a href="{% url 'familiar_delete' object.id %}" class="button">Deletar</a>
+    <a href="{% url 'familiar_list' %}" class="button">Voltar à Lista</a>
+</body>
+</html>

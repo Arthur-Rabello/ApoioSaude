@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários Autorizados</title>
+    <link rel="stylesheet" href="{% static 'css/list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/button.css' %}">
+</head>
+<body>
+    {% include 'common/header.html'%}
+    <div class="container">
+        <h1>Usuários Autorizados para {{ paciente.nome }}</h1>
+        
+        <div class="authorized-users-list">
+            <div class="user-category">
+                <h2>Médicos</h2>
+                <ul>
+                    {% for medico in medicos_autorizados %}
+                        <li>{{ medico.nome }} - {{ medico.especialidade }}</li>
+                    {% empty %}
+                        <li>Nenhum médico autorizado.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="user-category">
+                <h2>Familiares</h2>
+                <ul>
+                    {% for familiar in familiares_autorizados %}
+                        {% if familiar.user.user_type == 'familiar' %}
+                            <li>{{ familiar.nome }} - {{ familiar.relacao_com_paciente }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="user-category">
+                <h2>Cuidadores</h2>
+                <ul>
+                    {% for familiar in familiares_autorizados %}
+                        {% if familiar.user.user_type == 'cuidador' %}
+                            <li>{{ familiar.nome }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <div class="button-group" style="justify-content: center;">
+            <button onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary">Voltar à Página Inicial</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autorizar Acessos</title>
+    <link rel="stylesheet" href="{% static 'css/autorizacao_acesso.css' %}">
+</head>
+<body>
+    {% include 'common/header.html'%}
+    <div class="container">
+        <h2>Autorizar acesso para {{ paciente.nome }}</h2>
+        <div id="autorizados">
+            <h3>Usuários Autorizados</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Relação</th>
+                        <th style="border: hidden; background-color: white;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for info in autorizados_info %}
+                        <tr>
+                            <td>{{ info.nome_usuario | capfirst}}</td>
+                            <td>{{ info.email }}</td>
+                            <td>{{ info.relacao_com_paciente | capfirst}}</td>
+                            <td style="border-bottom-style: hidden; border-top-style: hidden; border-right-style: hidden;">
+                                <form method="post" action="{% url 'remover_autorizacao' info.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="remove-button">❌</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="button-group">
+                <button id="showFormButton" class="btn btn-primary">Cadastrar novo acesso</button>
+                <button onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary">Voltar à Página Inicial</button>
+            </div>
+        </div>
+
+        <div id="formulario" style="display: none;">
+            <form method="post" action="{% url 'autorizacao_acesso' paciente.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="email">Email do usuário:</label>
+                    <input type="email" id="email" name="email" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="user_type">Tipo de Usuário:</label>
+                    <select id="user_type" name="user_type" class="form-control" onchange="toggleRelacaoComPaciente()">
+                        <option value="familiar">Familiar</option>
+                        <option value="cuidador">Cuidador</option>
+                        <option value="medico">Medico</option>
+                    </select>
+                </div>
+                <div class="form-group" id="relacao_com_paciente_group">
+                    <label for="relacao_com_paciente">Relação com o Paciente:</label>
+                    <input type="text" id="relacao_com_paciente" name="relacao_com_paciente" required class="form-control">
+                    {% if messages %}
+                        <ul class="messages" id="error-messages" style="display: none;">
+                            {% for message in messages %}
+                                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="autorizado">Acesso Autorizado:</label>
+                    <input type="checkbox" id="autorizado" name="autorizado" class="form-check-input">
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="button" id="hideFormButton" class="btn btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleRelacaoComPaciente() {
+            var userType = document.getElementById('user_type').value;
+            var relacaoComPacienteGroup = document.getElementById('relacao_com_paciente_group');
+            var relacaoComPacienteInput = document.getElementById('relacao_com_paciente');
+            if (userType === 'familiar') {
+                relacaoComPacienteGroup.style.display = 'block';
+                relacaoComPacienteInput.setAttribute('required', 'required');
+            } else {
+                relacaoComPacienteGroup.style.display = 'none';
+                relacaoComPacienteInput.removeAttribute('required');
+            }
+        }
+
+        document.getElementById('showFormButton').addEventListener('click', function() {
+            document.getElementById('autorizados').style.display = 'none';
+            document.getElementById('formulario').style.display = 'block';
+            toggleRelacaoComPaciente();
+        });
+
+        document.getElementById('hideFormButton').addEventListener('click', function() {
+            document.getElementById('autorizados').style.display = 'block';
+            document.getElementById('formulario').style.display = 'none';
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleRelacaoComPaciente();
+        });
+    </script>
+</body>
+</html>

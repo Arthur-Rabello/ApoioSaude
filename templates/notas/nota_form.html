@@ -1,0 +1,21 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if object %}Editar Nota de Observação{% else %}Adicionar Nota de Observação{% endif %}</title>
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/button.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>{% if object %}Editar Nota de Observação{% else %}Adicionar Nota de Observação{% endif %}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button type="button" onclick="window.location.href='{% url 'nota_list'%}'" class="btn btn-secondary">Voltar</button>
+        </form>
+        
+    </div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalhes da Consulta</title>
+    <link rel="stylesheet" href="{% static 'css/detail.css' %}">
+<body>
+    <h1>Consulta</h1>
+    <p><b>Data:</b> {{ object.data }}</p>
+    <p><b>Hora:</b> {{ object.hora }}</p>
+    <p><b>Paciente:</b> {{ object.paciente.nome }}</p>
+    <p><b>Médico:</b> {{ object.medico.nome }}</p>
+    <p><b>Descrição:</b> {{object.descricao}}</p>
+    <a href="{% url 'consulta_update' object.id %}" class="button">Editar</a>
+    <a href="{% url 'consulta_delete' object.id %}"class="button">Deletar</a>
+    <a href="{% url 'consulta_list' %}"class="button">Voltar à Lista</a>
+</body>
+</html>

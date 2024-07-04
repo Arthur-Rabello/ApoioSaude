@@ -1,0 +1,102 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<div class="navbar">
+    <nav>
+        <ul class="nav-list">
+            <a href="{% url 'index'%}"><img src="{% static 'img/IconHeader.png'%}" alt="logo" class="img1" ></img></a>      
+            <li class="nav-link">
+                <a href="#" onclick="toggleMenu('paciente-menu')">Pacientes</a>
+                <div id="paciente-menu" class="dropdown-menu">
+                    <a href="{% url 'paciente_list' %}">Mostrar pacientes</a>
+                    <a href="{% url 'create_paciente' %}">Criar novo paciente</a>
+                    <a href="#" id="autorizacao-link">Autorizar usuários</a>
+                </div>
+            </li>
+            <li class="nav-link">
+                <a href="#" onclick="toggleMenu('familiar-menu')">Usuários Autorizados</a>
+                <div id="familiar-menu" class="dropdown-menu">
+                    <a href="#" id="autorizacao-list">Mostrar usuários autorizados</a>
+                </div>
+            </li>
+            <li class="nav-link">
+                <a href="#" onclick="toggleMenu('medicamento-menu')">Medicamentos</a>
+                <div id="medicamento-menu" class="dropdown-menu">
+                    <a href="{% url 'medicamento_list' %}">Mostrar medicamentos</a>
+                    <a href="{% url 'medicamento_create' %}">Criar novo medicamento</a>
+                </div>
+            </li>
+            <li class="nav-link">
+                <a href="#" onclick="toggleMenu('nota-menu')">Notas de Observação</a>
+                <div id="nota-menu" class="dropdown-menu">
+                    <a href="{% url 'nota_list' %}">Mostrar notas</a>
+                    <a href="{% url 'nota_create' %}">Criar nova nota</a>
+                </div>
+            </li>
+            <li class="nav-link">
+                <a href="#" onclick="toggleMenu('consulta-menu')">Consultas</a>
+                <div id="consulta-menu" class="dropdown-menu">
+                    <a href="{% url 'consulta_list' %}">Mostrar consultas</a>
+                    <a href="{% url 'consulta_create' %}">Criar nova consulta</a>
+                </div>
+            </li>
+            <li class="nav-link" style="margin-left: 600px;">
+                <a href="#" onclick="toggleMenu('perfil-menu')" class="fas fa-user"></a>
+                <div id="perfil-menu" class="dropdown-menu" >
+                    <a href="{% url 'perfil_generico' user.id %}" >Mostrar perfil</a>
+                    <a href="{% url 'logout' %}">Desconectar</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var patients = {{ pacientes_ids|safe }};
+
+        function updateAuthorizationLink(index) {
+            var patientId = patients[index];
+            var link = document.getElementById('autorizacao-link');
+            link.href = "{% url 'autorizacao_acesso' '0' %}".replace('0', patientId);
+        }
+        
+        function updateAuthorizationList(index) {
+            var patientId = patients[index];
+            var link = document.getElementById('autorizacao-list');
+            link.href = "{% url 'autorizado_list' '0' %}".replace('0', patientId);
+        }
+
+        if (patients.length > 0) {
+            updateAuthorizationLink(0);
+            updateAuthorizationList(0);
+        }
+    });
+
+    function toggleMenu(id) {
+        var menus = document.getElementsByClassName('dropdown-menu');
+        for (var i = 0; i < menus.length; i++) {
+            if (menus[i].id !== id) {
+                menus[i].style.display = 'none';
+            }
+        }
+        var menu = document.getElementById(id);
+        if (menu.style.display === "block") {
+            menu.style.display = "none";
+        } else {
+            menu.style.display = "block";
+        }
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.matches('.nav-link a, .user-icon a')) {
+            var dropdowns = document.getElementsByClassName("dropdown-menu");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.style.display === "block") {
+                    openDropdown.style.display = "none";
+                }
+            }
+        }
+    }
+</script>

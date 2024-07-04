@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Apoio Saúde</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+
+    {% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                <a{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</a>
+                {% if 'email_verification' in message.tags %}
+                    <div class="resend-email">
+                        <a href="{% url 'resend_verification_email' %}" class="btn3">Reenviar e-mail de verificação</a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <script>
+            setTimeout(function() {
+                document.querySelector('.alert.alert-danger').style.display = 'none';
+            }, 6000);
+        </script>
+    {% endif %}
+
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo">
+            <h2>Apoio Saúde</h2>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Login" required>
+            <input type="password" name="password" placeholder="Senha" required>
+            <div class="a-group">
+                <a class="a1">Esqueceu sua senha?</a> 
+                <a href="{% url 'password_reset' %}" class="btn2">Clique aqui</a>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='{% url 'register' %}'">Criar conta</button>
+                <button type="submit" class="btn btn-primary">Entrar</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,327 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApoioSaúde</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet'>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/pt-br.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo.png' %}">
+</head>
+<body>
+    {% include 'common/header.html' %}
+
+    <div class="container">
+        <div class="row">
+            <div class="carousel-container">
+                <h2>Perfil</h2>
+                {% if pacientes_data %}
+                {% for data in pacientes_data %}
+                    <div class="patient-card" data-paciente-id="{{ data.paciente.id }}" style="display:none;">
+                        <div class="profile-container">
+                            <div class="profile-header">
+                                {% if data.paciente.foto_perfil %}
+                                    <a href="{% url 'paciente_detail' data.paciente.id %}">
+                                        <img src="{{ data.paciente.foto_perfil.url }}" alt="Foto de perfil de {{ data.paciente.nome }}" class="profile-pic">
+                                    </a>
+                                {% else %}
+                                    <p>Sem foto de perfil.</p>
+                                {% endif %}
+                            </div>
+                            <div class="profile-info">
+                                <h2 class="profile-info h2">{{ data.paciente.nome }}</h2>
+                                <p><strong>Idade:</strong> {{ data.paciente.calcular_idade }}</p>
+                                <p><strong>Data de Nascimento:</strong> {{ data.paciente.data_nascimento|date:"d/m/Y" }}</p>
+                                <p><strong>Tipo Sanguíneo:</strong> {{ data.paciente.tipo_sanguineo }}</p>
+                                <p><strong>Doença(s):</strong> {{ data.paciente.doenca }}</p>
+                                <p><strong>Outros Dados:</strong> {{ data.paciente.outros_dados }}</p>
+                            </div>
+                        </div>
+                        <ul class="patient-notes" style="display:none;">
+                            {% for nota in data.notas %}
+                            <li data-autor="{{ nota.autor.username }}">{{ nota.data_hora|date:"d/m/Y H:i" }} - {{ nota.conteudo }}</li>
+
+                            {% endfor %}
+                        </ul>
+                        <ul class="patient-medications" style="display:none;">
+                            {% for medicamento in data.medicamentos %}
+                                <li>
+                                    <b>{{ medicamento.nome }}</b><br> 
+                                    Dosagem: {{ medicamento.dosagem }}<br> 
+                                    Frequência: {{ medicamento.frequencia }}<br>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <ul class="patient-consultas" style="display:none;">
+                            {% for consulta in data.consultas %}
+                                <li data-title="{{ consulta.descricao }}" data-start="{{ consulta.formatted_datetime }}"></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+                <div class="row1">
+                    <div class="mini-cards-container">
+                        <div id="previous-patient"></div>
+                        <div class="mini-cards-wrapper">
+                            {% for data in pacientes_data %}
+                                <div class="mini-patient-card" data-paciente-id="{{ data.paciente.id }}">
+                                    {% if data.paciente.foto_perfil %}
+                                        <img src="{{ data.paciente.foto_perfil.url }}" alt="Foto de perfil de {{ data.paciente.nome }}" class="mini-profile-pic">
+                                    {% else %}
+                                        <img src="{% static 'img/default-profile.png' %}" alt="Sem foto" class="mini-profile-pic">
+                                    {% endif %}
+                                    <p>{{ data.paciente.nome }}</p>
+                                </div>
+                            {% endfor %}
+                            <div class ="mini-add-patient-card" id="add-patient-card">
+                                <a href="{% url 'create_paciente' %}">
+                                    <div class="add-icon">+</div>
+                                </a>
+                            </div>
+                        </div>
+                        <div id="next-patient"></div>
+                    </div>
+                </div>
+                {% else%}
+                    <p class="no-patients-message">Você ainda não possui pacientes cadastrados. <a href="{% url 'create_paciente' %}">Adicione um paciente.</a></p>
+                {%endif%}
+            </div>
+            
+            {% if user_type in 'familiar' or 'cuidador' %}
+            <div class="carousel-container">
+                <div class="notes-header">
+                    <h2>Notas</h2>
+                    <a href="{% url 'nota_create' %}" class="add-note-link">+</a>
+                </div>
+                <div id="notes-container">
+                    <!-- Notas serão renderizadas aqui -->
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="box">
+                <h2>Calendário de Eventos</h2>
+                <div id="calendar" class="calendar"></div>
+            </div>
+            
+            {% endif %}
+            <div class="box">
+                <div class="notes-header">
+                    <h2>Medicamento</h2>
+                    <a href="{% url 'medicamento_create' %}" class="add-note-link">+</a>
+                </div>
+                <ul id="medications-container">
+                    <!-- Medicamentos serão renderizadas aqui -->
+                </ul>
+            </div> 
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var currentPatientIndex = 0;
+            var currentCardIndex = 0;
+            var patients = document.querySelectorAll('.patient-card');
+            var miniPatientCards = document.querySelectorAll('.mini-patient-card, .mini-add-patient-card');
+            var miniAddPatientCard = document.querySelector('.mini-add-patient-card');
+            var miniCardsWrapper = document.querySelector('.mini-cards-wrapper');
+            var notesContainer = document.getElementById('notes-container');
+            var medicationsContainer = document.getElementById('medications-container');
+            var calendarEl = document.getElementById('calendar');
+            var cardsToShow = 2;
+        
+            function renderPatient(index) {
+                patients.forEach(function(patient, idx) {
+                    if (idx === index) {
+                        patient.style.display = 'flex'; // Altere para 'flex' para usar flexbox
+                        renderNotes(patient);
+                        renderMedications(patient);
+                        renderCalendar(patient);
+                    } else {
+                        patient.style.display = 'none';
+                    }
+                });
+                updateAuthorizationLink(index);
+                updateAuthorizationList(index);
+                hideCurrentMiniCard(index);
+                showCards();
+            }
+        
+            function renderNotes(patient) {
+                var notes = patient.querySelectorAll('.patient-notes li');
+                notesContainer.innerHTML = '';
+                var now = moment();
+                notes.forEach(function(note) {
+                    var noteDateTime = note.textContent.split(' - ')[0];
+                    var noteMoment = moment(noteDateTime, "DD/MM/YYYY HH:mm");
+                    if (now.diff(noteMoment, 'days') <= 2) { // Verifica se a nota está dentro dos últimos 2 dias
+                        var noteItem = document.createElement('div');
+                        noteItem.classList.add('note-item');
+        
+                        var noteTitle = document.createElement('div');
+                        noteTitle.classList.add('note-title');
+                        var author = note.dataset.autor; // Obtém o autor da nota
+                        noteTitle.textContent = author; // Define o título da nota com o autor
+        
+                        var noteContent = document.createElement('div');
+                        noteContent.classList.add('note-content');
+                        var content = note.textContent.split(' - ')[1]; // Pega o conteúdo da nota
+                        noteContent.innerHTML = content; // Define o conteúdo da nota
+        
+                        var noteTime = document.createElement('div');
+                        noteTime.classList.add('note-time');
+                        noteTime.textContent = noteMoment.format("DD/MM - HH:mm"); // Formata o horário
+        
+                        noteItem.appendChild(noteTitle);
+                        noteItem.appendChild(noteContent);
+                        noteItem.appendChild(noteTime);
+                        notesContainer.appendChild(noteItem);
+                    }
+                });
+            }
+        
+            function renderMedications(patient) {
+                var medications = patient.querySelectorAll('.patient-medications li');
+                medicationsContainer.innerHTML = '';
+        
+                medications.forEach(function(medication, index) {
+                    // Clone o item da lista de medicamentos
+                    var clonedMedication = medication.cloneNode(true);
+        
+                    // Adicione a classe medication-item
+                    clonedMedication.classList.add('medication-item');
+        
+                    // Adicione a borda inferior, exceto para o último item
+                    if (index < medications.length - 1) {
+                        clonedMedication.style.borderBottom = '1px solid #ccc';
+                    }
+        
+                    // Adicione o item clonado ao container de medicamentos
+                    medicationsContainer.appendChild(clonedMedication);
+                });
+            }
+        
+            function renderCalendar(patient) {
+                var events = [];
+                patient.querySelectorAll('.patient-consultas li').forEach(function(event) {
+                    events.push({
+                        title: event.dataset.title,
+                        start: event.dataset.start,
+                        allDay: false
+                    });
+                });
+        
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    locale: 'pt-br',
+                    headerToolbar: {
+                        left: 'dayGridMonth,timeGridWeek,timeGridDay',
+                        center: 'title',
+                        right: 'today prev,next'
+                    },
+                    buttonText: {
+                        today: 'Hoje',
+                        month: 'Mês',
+                        week: 'Semana',
+                        day: 'Dia'
+                    },
+                    titleFormat: {
+                        month: 'long',
+                        year: 'numeric'
+                    },
+                    events: events,
+                    eventClick: function(info) {
+                        var formattedDate = moment(info.event.start).format('DD/MM/YYYY');
+                        var formattedTime = new Date(info.event.start).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                        alert(info.event.title + '\nData: ' + formattedDate + '\nHora: ' + formattedTime);
+                    },
+                });
+                calendar.render();
+            }
+        
+            function updateAuthorizationLink(index) {
+                var patientId = patients[index].dataset.pacienteId;
+                var link = document.getElementById('autorizacao-link');
+                link.href = "{% url 'autorizacao_acesso' '0' %}".replace('0', patientId);
+            }
+        
+            function updateAuthorizationList(index) {
+                var patientId = patients[index].dataset.pacienteId;
+                var link = document.getElementById('autorizacao-list');
+                link.href = "{% url 'autorizado_list' '0' %}".replace('0', patientId);
+            }
+        
+            function hideCurrentMiniCard(index) {
+                miniPatientCards.forEach(function(card) {
+                    if (patients[index].dataset.pacienteId === card.dataset.pacienteId) {
+                        card.style.display = 'none';
+                    } else {
+                        card.style.display = 'flex';
+                    }
+                });
+            }
+        
+            function showCards() {
+                let cardsShown = 0;
+                miniPatientCards.forEach(function(card, idx) {
+                    if (patients[currentPatientIndex].dataset.pacienteId === card.dataset.pacienteId) {
+                        card.style.display = 'none';
+                    } else {
+                        if (cardsShown >= currentCardIndex && cardsShown < currentCardIndex + cardsToShow) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                        cardsShown++;
+                    }
+                });
+            }
+        
+            function showNextCards() {
+                if (currentCardIndex + cardsToShow < miniPatientCards.length - 1) {
+                    currentCardIndex++;
+                } else {
+                    currentCardIndex = 0; // Volta ao primeiro card
+                }
+                showCards();
+            }
+        
+            function showPreviousCards() {
+                if (currentCardIndex > 0) {
+                    currentCardIndex--;
+                } else {
+                    currentCardIndex = miniPatientCards.length - cardsToShow - 1; // Vai ao último card
+                }
+                showCards();
+            }
+        
+            document.getElementById('next-patient').addEventListener('click', showNextCards);
+            document.getElementById('previous-patient').addEventListener('click', showPreviousCards);
+        
+            miniPatientCards.forEach(function(card) {
+                card.addEventListener('click', function() {
+                    currentPatientIndex = Array.from(patients).findIndex(patient => patient.dataset.pacienteId === card.dataset.pacienteId);
+                    renderPatient(currentPatientIndex);
+                });
+            });
+        
+            renderPatient(currentPatientIndex);
+        });
+        
+        $(document).ready(function() {
+            $('#add-patient-card').click(function(event) {
+                event.preventDefault();
+                window.location.href = $(this).find('a').attr('href');
+            });
+        });
+        
+        
+    </script>
+</body>
+</html>

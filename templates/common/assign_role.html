@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autorizar Acesso</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Autorizar Acesso</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="email">Email do Usuário:</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="paciente_id">Paciente:</label>
+                <select id="paciente_id" name="paciente_id" class="form-control">
+                    {% for paciente in pacientes %}
+                        <option value="{{ paciente.id }}">{{ paciente.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="autorizado">Autorizado:</label>
+                <input type="checkbox" id="autorizado" name="autorizado" class="form-check-input">
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+        </form>
+        <hr>
+        <h2>Pessoas Autorizadas</h2>
+        {% for paciente in pacientes %}
+            <h3>{{ paciente.nome }}</h3>
+            <ul>
+                {% for autorizacao in paciente.autorizacao_set.all %}
+                    <li>
+                        {{ autorizacao.email }} - 
+                        {% if autorizacao.autorizado %}
+                            <span class="text-success">Autorizado</span>
+                        {% else %}
+                            <span class="text-danger">Não Autorizado</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </div>
+</body>
+</html>

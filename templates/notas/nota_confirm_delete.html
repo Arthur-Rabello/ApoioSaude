@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deletar Nota de Observação</title>
+</head>
+<body>
+    <h1>Deletar Nota de Observação</h1>
+    <p>Tem certeza que deseja deletar esta nota?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Deletar</button>
+    </form>
+    <a href="{% url 'nota_list' %}">Voltar à Lista</a>
+</body>
+</html>

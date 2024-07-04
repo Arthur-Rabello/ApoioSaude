@@ -1,0 +1,16 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalhes da Nota de Observação</title>
+    <link rel="stylesheet" href="{% static 'css/detail.css' %}">
+</head>
+<body>
+    <h1>Nota de Observação</h1>
+    <p>Data e Hora: {{ object.data_hora }}</p>
+    <p>Conteúdo: {{ object.conteudo }}</p>
+    <a href="{% url 'nota_update' object.id %}"class="button">Editar</a>
+    <a href="{% url 'nota_delete' object.id %}"class="button">Deletar</a>
+    <a href="{% url 'nota_list' %}"class="button">Voltar à Lista</a>
+</body>
+</html>

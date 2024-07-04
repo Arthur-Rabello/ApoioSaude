@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalhes do Medicamento</title>
+    <link rel="stylesheet" href="{% static 'css/detail.css' %}">
+</head>
+<body>
+    <h1>Medicamento</h1>
+    <p>Nome: {{ object.nome }}</p>
+    <p>Dosagem: {{ object.dosagem }}</p>
+    <p>Frequência: {{ object.frequencia }}</p>
+    <p>Paciente: {{ object.paciente.nome }}</p>
+    <a href="{% url 'medicamento_update' object.id %}" class="button">Editar</a>
+    <a href="{% url 'medicamento_delete' object.id %}" class="button">Deletar</a>
+    <a href="{% url 'medicamento_list' %}" class="button">Voltar à Lista</a>
+</body>
+</html>

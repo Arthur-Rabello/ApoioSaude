@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Lista de Notas</title>
+    <link rel="stylesheet" href="{% static 'css/list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/button.css' %}">
+</head>
+<body>
+    {% include 'common/header.html' %}
+    <div class="content">
+        <h1>Lista de Notas</h1>
+        <div class="notes-list">
+            {% for nota in notas_autorizadas %}
+                <div class="note-card">
+                    <div class="note-header">
+                        <strong>{{ nota.autor }}</strong>
+                        <span>{{ nota.data_formatada }}</span>
+                    </div>
+                    <div class="note-content">
+                        <p>{{ nota.conteudo }}</p>
+                    </div>
+                    <div class="note-actions">
+                        <button type="button" onclick="window.location.href='{% url 'nota_update' nota.id %}'" class="btn btn-primary">Editar</button>
+                        <button type="button" onclick="window.location.href='{% url 'nota_delete' nota.id %}'" class="btn btn-delete">Excluir</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="button-group">
+            <button type="button" onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary">Voltar para página inicial</button>
+            <button type="button" onclick="window.location.href='{% url 'nota_create' %}'" class="btn btn-primary">Adicionar Nota</button>
+        </div>
+    </div>
+</body>
+</html>

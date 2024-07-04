@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deletar Familiar</title>
+</head>
+<body>
+    <h1>Deletar Familiar</h1>
+    <p>Tem certeza que deseja deletar {{ object.nome }}?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Deletar</button>
+    </form>
+    <a href="{% url 'familiar_list' %}">Voltar à Lista</a>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if object %}Editar Médico{% else %}Adicionar Médico{% endif %}</title>
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>{% if object %}Editar Médico{% else %}Adicionar Médico{% endif %}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Salvar</button>
+        </form>
+        <a href="{% url 'medico_list' %}">Voltar à Lista</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar - Apoio Saúde</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+</head>
+<body>
+    <div class="register-container">
+        <h2>Registrar</h2>
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                {{ user_form.username.label_tag }} 
+                {{ user_form.username }}
+                {% if user_form.username.errors %}
+                    <div class="error">{{ user_form.username.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ user_form.email.label_tag }} 
+                {{ user_form.email }}
+                {% if user_form.email.errors %}
+                    <div class="error">{{ user_form.email.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ user_form.password1.label_tag }}
+                {{ user_form.password1 }}
+                <ul class="password-help" id="password-help-1">
+                    <li class="invalid" id="password-criteria-1">Sua senha não pode ser muito parecida com o resto das suas informações pessoais.</li>
+                    <li class="invalid" id="password-criteria-2">Sua senha precisa conter pelo menos 8 caracteres.</li>
+                    <li class="invalid" id="password-criteria-3">Sua senha não pode ser uma senha comumente utilizada.</li>
+                    <li class="invalid" id="password-criteria-4">Sua senha não pode ser inteiramente numérica.</li>
+                </ul>
+                {% if user_form.password1.errors %}
+                    <div class="error">{{ user_form.password1.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ user_form.password2.label_tag }}
+                {{ user_form.password2 }}
+                <ul class="password-help" id="password-help-2">
+                    <li class="invalid" id="password-criteria-5">As senhas devem coincidir.</li>
+                </ul>
+                {% if user_form.password2.errors %}
+                    <div class="error">{{ user_form.password2.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ user_form.user_type.label_tag }} 
+                {{ user_form.user_type }}
+                {% if user_form.user_type.errors %}
+                    <div class="error">{{ user_form.user_type.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div id="dynamic-form">
+                <!-- Dados do formulário dinâmico vão ser inseridos aqui -->
+            </div>
+
+            <button type="submit">Registrar</button>
+        </form>
+        <div class="login-group">
+            <p>Já possui uma conta?</p>
+            <a href="{% url 'login' %}" class="btn2">Login</a>
+        </div>
+
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function getFamiliarForm() {
+                return `
+                   {% for field in familiar_form %}
+                       <div class="form-group">
+                           {{ field.label_tag }} {{ field }}
+                           {% if field.help_text %}
+                               <small class="form-text text-muted">{{ field.help_text }}</small>
+                           {% endif %}
+                           {% if field.errors %}
+                               <div class="error">{{ field.errors }}</div>
+                           {% endif %}
+                       </div>
+                   {% endfor %}
+                `;
+            }
+
+            function getMedicoForm() {
+                return `
+                    {% for field in medico_form %}
+                        <div class="form-group">
+                            {{ field.label_tag }} {{ field }}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% if field.errors %}
+                               <div class="error">{{ field.errors }}</div>
+                           {% endif %}
+                        </div>
+                    {% endfor %}
+                `;
+            }
+
+            function toggleForms() {
+                var userType = document.getElementById('id_user_type').value;
+                var dynamicForm = document.getElementById('dynamic-form');
+                if (userType === 'medico') {
+                    dynamicForm.innerHTML = getMedicoForm();
+                } else {
+                    dynamicForm.innerHTML = getFamiliarForm();
+                }
+
+                // Esconder o campo Relação com Paciente se o tipo de usuário não for Familiar
+                if (userType === 'cuidador') {
+                    var relacaoComPacienteField = document.getElementById('relacao-com-paciente');
+                    if (relacaoComPacienteField) {
+                        relacaoComPacienteField.style.display = 'none';
+                    }
+                }
+            }
+
+            document.getElementById('id_user_type').addEventListener('change', toggleForms);
+            window.onload = toggleForms;
+
+            // Validação e exibição de ajuda da senha
+            const passwordField1 = document.getElementById('id_password1');
+            const passwordField2 = document.getElementById('id_password2');
+            const helpText1 = document.getElementById('password-help-1');
+            const helpText2 = document.getElementById('password-help-2');
+
+            passwordField1.addEventListener('focus', function() {
+                helpText1.classList.add('visible');
+            });
+
+            passwordField1.addEventListener('blur', function() {
+                helpText1.classList.remove('visible');
+            });
+
+            passwordField1.addEventListener('input', function() {
+                validatePassword1(passwordField1.value);
+                validatePassword2(passwordField1.value, passwordField2.value);
+            });
+
+            passwordField2.addEventListener('focus', function() {
+                helpText2.classList.add('visible');
+            });
+
+            passwordField2.addEventListener('blur', function() {
+                helpText2.classList.remove('visible');
+            });
+
+            passwordField2.addEventListener('input', function() {
+                validatePassword2(passwordField1.value, passwordField2.value);
+            });
+
+            function validatePassword1(password) {
+                const criteria = [
+                    /.{8,}/, // Pelo menos 8 caracteres
+                    /.*[A-Z].*/, // Pelo menos uma letra maiúscula
+                    /.*[a-z].*/, // Pelo menos uma letra minúscula
+                    /.*[0-9].*/, // Pelo menos um número
+                    /.*[^A-Za-z0-9].*/ // Pelo menos um caractere especial
+                ];
+
+                criteria.forEach((regex, index) => {
+                    const element = document.getElementById(`password-criteria-${index + 1}`);
+                    if (regex.test(password)) {
+                        element.classList.add('valid');
+                        element.classList.remove('invalid');
+                    } else {
+                        element.classList.add('invalid');
+                        element.classList.remove('valid');
+                    }
+                });
+            }
+
+            function validatePassword2(password1, password2) {
+                const element = document.getElementById('password-criteria-5');
+                if (password1 === password2) {
+                    element.classList.add('valid');
+                    element.classList.remove('invalid');
+                } else {
+                    element.classList.add('invalid');
+                    element.classList.remove('valid');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

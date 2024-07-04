@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Consultas</title>
+    <link rel="stylesheet" href="{% static 'css/list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/button.css' %}">
+</head>
+<body>
+    {% include 'common/header.html' %}
+    <div class="content">
+        <h1>Lista de Consultas</h1>
+        <div class="consultations-list">
+            {% for consulta in consultas_autorizadas %}
+                <div class="consultation-card">
+                    <div class="consultation-header">
+                        <h3><strong>{{ consulta.data | date:"d/m/Y" }}</strong></h3> <h3><strong>{{ consulta.hora | date:"H:i" }}</strong></h3> 
+                    </div>
+                    <div class="consultation-content">
+                        <p><strong>Paciente:</strong> {{ consulta.paciente.nome }}</p>
+                        {%if consulta.medico.nome != null%}
+                            <p><strong>Médico:</strong> {{ consulta.medico.nome }}</p>
+                        {%endif%}
+                        <p><strong>Descrição:</strong> {{ consulta.descricao }}</p>
+                    </div>
+                    <div class="consultation-actions">
+                        <button type="button" onclick="window.location.href='{% url 'consulta_update' consulta.id %}'" class="btn btn-primary">Editar</button>
+                        <button type="button" onclick="window.location.href='{% url 'consulta_delete' consulta.id %}'" class="btn btn-delete">Excluir</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="button-group">
+            <button type="button" onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary">Voltar para página inicial</button>
+            <button type="button" onclick="window.location.href='{% url 'consulta_create' %}'" class="btn btn-primary">Adicionar Consulta</button>
+        </div>
+    </div>
+</body>
+</html>

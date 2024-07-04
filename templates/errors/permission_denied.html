@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permissão Negada</title>
+    <link rel="stylesheet" href="{% static 'css/error.css' %}">
+</head>
+<body>
+    {% include 'header.html'%}
+    <div class="error-container">
+        <div class="error-content">
+            <div class="error-icon">❌</div>
+            <h2>Você não tem permissão para acessar esta página.</h2>
+        </div>
+    </div>
+</body>
+</html>

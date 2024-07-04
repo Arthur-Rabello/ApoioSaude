@@ -1,0 +1,20 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if object %}Editar Consulta{% else %}Adicionar Consulta{% endif %}</title>
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/button.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>{% if object %}Editar Consulta{% else %}Adicionar Consulta{% endif %}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button type="button" onclick="window.location.href={% url 'consulta_list' %}" class="btn btn-secondary">Voltar à Lista</button>
+        </form>
+    </div>
+</body>
+</html>

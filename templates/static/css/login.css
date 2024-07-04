@@ -1,0 +1,143 @@
+body {
+    display: flex;
+    align-items: center;
+    height: 100vh;
+    background-image: url("/static/img/fundo.jpg");
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.login-container {
+    display: flex;
+    align-items: center;
+    margin-left: 150px;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 30px;
+    margin-right: 50px;
+}
+
+.logo {
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    color: #232EB8;
+    margin: 0;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+}
+
+input[type="text"], input[type="password"] {
+    width: calc(100% - 40px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.btn {
+    width: 45%;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background-color: #232EB8;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #ccc;
+    color: black;
+}
+
+.alert {
+    padding: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    position: absolute;
+    top: 20px; /* Ajuste conforme necessário */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000; /* Garante que a mensagem esteja acima de outros elementos */
+}
+  
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.btn2 {
+    width: 30%;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    font-size: 12px;
+    color: green;
+}
+
+.a1{
+    font-size: 12px; 
+}
+
+.a-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+
+}
+
+.btn3 {
+    width: 30%;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 12px;
+    color: blue;
+}
+
+.resend-email{
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    justify-content: center;
+    align-items: center;
+}

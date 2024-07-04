@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Familiares</title>
+    <link rel="stylesheet" href="{% static 'css/list.css' %}">
+</head>
+<body>
+    {% include 'header.html'%}
+    <div class="content">
+        <h1>Lista de Familiares</h1>
+        <ul>
+            {% for familiar in object_list %}
+                <li>{{ familiar.user.username }} - {{ familiar.relacao_com_paciente }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'index' %}" class="button">Voltar para página inicial</a>
+    </div>
+</body>
+</html>

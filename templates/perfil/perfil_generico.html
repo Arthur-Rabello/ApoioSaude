@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - Apoio Saúde</title>
+    <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+    <link rel="stylesheet" href="{% static 'css/button.css' %}">
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1>Perfil</h1>
+        </div>
+        <div class="profile-info">
+            <p><strong>Nome de Usuário:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Tipo de Usuário:</strong> {{ user_type | capfirst}}</p>
+        </div>
+
+        {% if user_type == 'familiar' or user_type == 'cuidador' %}
+            <div class="familiar-info">
+                <h3>Informações do {{user_type|capfirst}}</h3>
+                {% if profile %}
+                    <p><strong>Nome:</strong> {{ profile.nome }}</p>
+                    <p><strong>Informações de Contato:</strong> {{ profile.informacoes_contato }}</p>
+                {% else %}
+                    <p>Informações de perfil não disponíveis.</p>
+                {% endif %}
+            </div>
+        {% elif user_type == 'medico' %}
+            <div class="medico-info">
+                <h3>Informações do Médico</h3>
+                {% if profile %}
+                    <p><strong>Nome:</strong> {{ profile.nome }}</p>
+                    <p><strong>Especialidade:</strong> {{ profile.especialidade }}</p>
+                    <p><strong>Informações de Contato:</strong> {{ profile.informacoes_contato }}</p>
+                {% else %}
+                    <p>Informações de perfil não disponíveis.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="button-group">
+            <button onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary">Voltar à Página Inicial</button>
+            <button onclick="window.location.href='{% url 'editar_perfil' user.id %}'" class="btn btn-primary">Editar Perfil</button>
+            {% if request.user == user %}
+                <form method="post" action="{% url 'delete_profile' user_id=user.id %}" onsubmit="return confirm('Tem certeza que deseja deletar este perfil?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-delete">Deletar Perfil</button>
+
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "apoiosaude",
+  "version": "1.0.0",
+  "description": "O projeto \"Apoio Saúde\" tem como objetivo simplificar a vida de familiares e cuidadores ao oferecer uma solução organizada e acessível para o cuidado de pacientes. Através dessa aplicação, os usuários poderão gerenciar informações relacionadas ao cuidado de seus entes queridos de forma eficiente e intuitiva.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.13",
+    "@fullcalendar/daygrid": "^6.1.13"
+  }
+}
