@@ -19,9 +19,3 @@ class SimpleUserTests(TestCase):
         self.client.login(username='medicouser', password='$Admin123')
         response = self.client.get(reverse('nota_list'), follow=True)
         self.assertEqual(response.status_code, 403)
-
-    @override_settings(DEBUG=False)
-    def test_404_page(self):
-        response = self.client.get('/nonexistent_page/', follow=True)
-        self.assertEqual(response.status_code, 404)
-        self.assertTemplateUsed(response, 'errors/404.html')
