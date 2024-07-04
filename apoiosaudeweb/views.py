@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, get_user_model
+from django.core.exceptions import PermissionDenied
 from .utils import formatar_data_pt_br,formatar_data_nascimento_pt_br
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
@@ -128,7 +129,7 @@ def perfil_generico(request, user_id):
     user = get_object_or_404(CustomUser, pk=user_id)
 
     if request.user != user:
-        return redirect('permission_denied')
+        raise PermissionDenied
 
     profile = None
     user_type = None
@@ -222,7 +223,7 @@ def create_paciente(request):
         else:
             form = PacienteForm()
     else:
-        return redirect('permission_denied')
+        raise PermissionDenied
     return render(request, 'pacientes/paciente_form.html', {'form': form})
 
 @login_required
@@ -468,8 +469,8 @@ class ConsultaDeleteView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,Dele
     template_name = 'consultas/consulta_confirm_delete.html'
     success_url = reverse_lazy('consulta_list')
 
-def permission_denied_view(request):
-    return render(request, 'permission_denied.html')
+def permission_denied_view(request, exception):
+    return render(request, 'permission_denied.html', status=403)
 
 @login_required
 def delete_profile(request, user_id):
@@ -488,7 +489,7 @@ def delete_profile(request, user_id):
 @login_required
 def autorizacao_acesso(request, paciente_id):
     if not hasattr(request.user, 'familiar') or not request.user.familiar.is_admin:
-        return redirect('permission_denied')
+       raise PermissionDenied
 
     paciente = get_object_or_404(Paciente, id=paciente_id)
     autorizacoes = Autorizacao.objects.filter(paciente=paciente).select_related('paciente')
@@ -599,6 +600,12 @@ def verify_email(request, token):
     user.save()
     messages.success(request, 'E-mail verificado com sucesso!')
     return redirect('login')
+
+def trigger_error(request):
+    # Aqui provocamos uma exceção dividindo por zero
+    return 1 / 0
+
+
 
 def send_verification_email(user, request):
     subject = 'Verifique seu e-mail'

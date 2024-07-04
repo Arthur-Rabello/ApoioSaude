@@ -1,29 +1,30 @@
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from .models import Paciente, Familiar, Autorizacao
+from django.core.exceptions import PermissionDenied
 
 class FamiliarRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.user_type != 'familiar':
-            return redirect(reverse('permission_denied'))
+            raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
 class MedicoRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.user_type != 'medico':
-            return redirect(reverse('permission_denied'))
+            raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
 class AllRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.user_type != 'medico' and request.user.user_type != 'cuidador' and request.user.user_type != 'familiar':
-            return redirect(reverse('permission_denied'))
+            raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
 class CuidadorFamiliarRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated or request.user.user_type != 'cuidador' and request.user.user_type != 'familiar':
-            return redirect(reverse('permission_denied'))
+            raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
 class AdminRequiredMixin:
@@ -43,6 +44,6 @@ class AdminRequiredMixin:
             familiar = None
         
         if not familiar:
-            return redirect(reverse('permission_denied'))  # Assumindo que você tenha uma view para permissões negadas
+            raise PermissionDenied  # Assumindo que você tenha uma view para permissões negadas
 
         return super().dispatch(request, *args, **kwargs)
