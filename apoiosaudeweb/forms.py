@@ -86,13 +86,22 @@ class NotaObservacaoForm(forms.ModelForm):
         fields = ['conteudo', 'paciente']
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)
+        super(NotaObservacaoForm, self).__init__(*args, **kwargs)
+        
+        user = kwargs.get('user')
         if user:
-            # Filtrar os pacientes autorizados para o usuário logado
+            # Filtra pacientes associados ao usuário (famílias e cuidadores)
+            pacientes = Paciente.objects.filter(familiares_cuidadores__user=user)
+            
+            # Filtra pacientes autorizados para este usuário
             autorizacoes = Autorizacao.objects.filter(email=user.email, autorizado=True)
-            paciente_ids = autorizacoes.values_list('paciente_id', flat=True)
-            self.fields['paciente'].queryset = Paciente.objects.filter(id__in=paciente_ids)
+            pacientes_autorizados = Paciente.objects.filter(id__in=[autorizacao.paciente.id for autorizacao in autorizacoes])
+
+            # Combina os dois conjuntos
+            pacientes = pacientes | pacientes_autorizados
+
+            # Define o queryset do campo 'paciente' para mostrar apenas os pacientes autorizados
+            self.fields['paciente'].queryset = pacientes
 
 class MedicamentoForm(forms.ModelForm):
     class Meta:

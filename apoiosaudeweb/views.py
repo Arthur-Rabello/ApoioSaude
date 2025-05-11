@@ -13,7 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .mixins import FamiliarRequiredMixin, CuidadorFamiliarRequiredMixin, AdminRequiredMixin, AllRequiredMixin, MedicoRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Paciente, Familiar, Medico, Medicamento, NotaObservacao, Consulta, CustomUser, Autorizacao
-from .forms import ConsultaForm, ConsultaForm, PacienteForm, CustomUserCreationForm, FamiliarRegisterForm, MedicoRegisterForm
+from .forms import ConsultaForm, ConsultaForm, PacienteForm, CustomUserCreationForm, FamiliarRegisterForm, MedicoRegisterForm, MedicamentoForm
 
 
 User = get_user_model()
@@ -183,8 +183,10 @@ class PacienteListView(LoginRequiredMixin, AllRequiredMixin, ListView):
         if user.user_type in ['familiar', 'cuidador']:
             pacientes = Paciente.objects.filter(familiares_cuidadores__user=user)
         else:
+            # Obtém os pacientes que foram autorizados para este usuário
             autorizacoes = Autorizacao.objects.filter(email=user.email, autorizado=True)
             pacientes = Paciente.objects.filter(id__in=[autorizacao.paciente.id for autorizacao in autorizacoes])
+
         return pacientes.distinct()
 
     def get_context_data(self, **kwargs):
@@ -194,9 +196,23 @@ class PacienteListView(LoginRequiredMixin, AllRequiredMixin, ListView):
             paciente.data_formatada = formatar_data_nascimento_pt_br(paciente.data_nascimento)
         return context
 
+
 class PacienteDetailView(LoginRequiredMixin, AllRequiredMixin, DetailView):
     model = Paciente
     template_name = 'pacientes/paciente_detail.html'
+
+    def get_object(self, queryset=None):
+        paciente = super().get_object(queryset)
+        user = self.request.user
+        
+        # Verificar se o usuário tem permissão para acessar o paciente
+        autorizacao = Autorizacao.objects.filter(email=user.email, paciente=paciente, autorizado=True).exists()
+
+        if not autorizacao:
+            raise PermissionDenied("Você não tem permissão para acessar este paciente.")
+
+        return paciente
+
 
 @login_required
 def create_paciente(request):
@@ -282,14 +298,10 @@ def autorizado_list_view(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     user_type = request.user.user_type
 
-    # Obter autorizacoes
     autorizacoes = Autorizacao.objects.filter(paciente=paciente, autorizado=True)
     autorizados_emails = autorizacoes.values_list('email', flat=True)
 
-    # Obter médicos autorizados
     medicos_autorizados = Medico.objects.filter(user__email__in=autorizados_emails)
-
-    # Obter familiares autorizados
     familiares_autorizados = Familiar.objects.filter(user__email__in=autorizados_emails)
 
     context = {
@@ -301,7 +313,6 @@ def autorizado_list_view(request, paciente_id):
     
     return render(request, 'common/autoridade_list.html', context)
 
-# Medico Views
 class MedicoDetailView(LoginRequiredMixin, AllRequiredMixin, DetailView):
     model = Medico
     template_name = 'medicos/medico_detail.html'  
@@ -344,21 +355,70 @@ class MedicamentoListView(LoginRequiredMixin, AllRequiredMixin, ListView):
         context['is_familiar_admin'] = getattr(self.request.user, 'is_familiar_admin', False)
         return context 
 
-class MedicamentoDetailView(LoginRequiredMixin, AllRequiredMixin, DetailView):
+class MedicamentoDetailView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, DetailView):
     model = Medicamento
-    template_name = 'medicamentos/medicamento_detail.html'  
+    template_name = 'medicamentos/medicamento_detail.html'
+
+    def get_object(self, queryset=None):
+        medicamento = super().get_object(queryset)
+        return medicamento
+
 
 class MedicamentoCreateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, CreateView):
     model = Medicamento
-    fields = ['nome', 'dosagem', 'frequencia', 'paciente']
+    form_class = MedicamentoForm
     template_name = 'medicamentos/medicamento_form.html'
     success_url = reverse_lazy('medicamento_list')
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        user = self.request.user
+       
+        pacientes = Paciente.objects.filter(familiares_cuidadores__user=user)
+     
+        autorizacoes = Autorizacao.objects.filter(email=user.email, autorizado=True)
+        pacientes_autorizados = Paciente.objects.filter(id__in=[autorizacao.paciente.id for autorizacao in autorizacoes])
+
+        pacientes = pacientes | pacientes_autorizados
+
+        form.fields['paciente'].queryset = pacientes.distinct()
+
+        return form
+
+    def form_valid(self, form):
+        form.instance.autor = self.request.user
+        return super().form_valid(form)
+
 class MedicamentoUpdateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, UpdateView):
     model = Medicamento
-    fields = ['nome', 'dosagem', 'frequencia', 'paciente']
-    template_name = 'medicamentos/medicamento_form.html'  
+    form_class = MedicamentoForm
+    template_name = 'medicamentos/medicamento_form.html'
     success_url = reverse_lazy('medicamento_list')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        user = self.request.user
+
+        pacientes = Paciente.objects.filter(familiares_cuidadores__user=user)
+
+        autorizacoes = Autorizacao.objects.filter(email=user.email, autorizado=True)
+        pacientes_autorizados = Paciente.objects.filter(id__in=[autorizacao.paciente.id for autorizacao in autorizacoes])
+
+        pacientes = pacientes | pacientes_autorizados
+
+        form.fields['paciente'].queryset = pacientes.distinct()
+
+        paciente_atual = self.get_object().paciente
+        if paciente_atual not in pacientes:
+            raise PermissionDenied("Você não tem permissão para editar este medicamento para o paciente selecionado.")
+
+        return form
+
+    def form_valid(self, form):
+        form.instance.autor = self.request.user
+        return super().form_valid(form)
+
 
 class MedicamentoDeleteView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin,DeleteView):
     model = Medicamento
@@ -395,25 +455,72 @@ class NotaObservacaoListView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin,L
         context['user_type'] = self.request.user.user_type
         context['is_familiar_admin'] = getattr(self.request.user, 'is_familiar_admin', False)
         return context
-class NotaObservacaoDetailView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,DetailView):
+class NotaObservacaoDetailView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, DetailView):
     model = NotaObservacao
-    template_name = 'notas/nota_detail.html'  
+    template_name = 'notas/nota_detail.html'
 
-class NotaObservacaoCreateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,CreateView):
+    def get_object(self, queryset=None):
+        nota = super().get_object(queryset)
+    
+
+        return nota
+
+
+class NotaObservacaoCreateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, CreateView):
     model = NotaObservacao
     fields = ['conteudo', 'paciente']
     template_name = 'notas/nota_form.html'  
     success_url = reverse_lazy('nota_list')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        
+        user = self.request.user
+
+        pacientes = Paciente.objects.filter(familiares_cuidadores__user=user)
+
+        autorizacoes = Autorizacao.objects.filter(email=user.email, autorizado=True)
+        pacientes_autorizados = Paciente.objects.filter(id__in=[autorizacao.paciente.id for autorizacao in autorizacoes])
+
+        pacientes = pacientes | pacientes_autorizados
+
+        form.fields['paciente'].queryset = pacientes.distinct()
+
+        return form
 
     def form_valid(self, form):
-        form.instance.autor = self.request.user 
-        return super().form_valid(form)
 
-class NotaObservacaoUpdateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,UpdateView):
+        form.instance.autor = self.request.user
+        return super().form_valid(form)
+class NotaObservacaoUpdateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, UpdateView):
     model = NotaObservacao
     fields = ['conteudo', 'paciente']
-    template_name = 'notas/nota_form.html'  
+    template_name = 'notas/nota_form.html'
     success_url = reverse_lazy('nota_list')
+
+    def get_form(self, form_class=None):
+
+        form = super().get_form(form_class)
+        user = self.request.user
+    
+        pacientes = Paciente.objects.filter(familiares_cuidadores__user=user)
+        
+        autorizacoes = Autorizacao.objects.filter(email=user.email, autorizado=True)
+        pacientes_autorizados = Paciente.objects.filter(id__in=[autorizacao.paciente.id for autorizacao in autorizacoes])
+
+        pacientes = pacientes | pacientes_autorizados
+
+        form.fields['paciente'].queryset = pacientes.distinct()
+
+        paciente_atual = self.get_object().paciente
+        if paciente_atual not in pacientes:
+            raise PermissionDenied("Você não tem permissão para editar a nota deste paciente.")
+
+        return form
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+
 
 class NotaObservacaoDeleteView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,DeleteView):
     model = NotaObservacao
@@ -448,21 +555,80 @@ class ConsultaListView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,ListVi
         context['is_familiar_admin'] = getattr(self.request.user, 'is_familiar_admin', False)
         return context
 
-class ConsultaDetailView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,DetailView):
+class ConsultaDetailView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, DetailView):
     model = Consulta
     template_name = 'consultas/consulta_detail.html'
 
-class ConsultaCreateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,CreateView):
+    def get_object(self, queryset=None):
+        consulta = super().get_object(queryset)
+        return consulta
+
+class ConsultaCreateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, CreateView):
     model = Consulta
     form_class = ConsultaForm
     template_name = 'consultas/consulta_form.html'
     success_url = reverse_lazy('consulta_list')
 
-class ConsultaUpdateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,UpdateView):
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        user = self.request.user
+
+        # Filtra pacientes associados ao usuário (familiares e cuidadores)
+        pacientes = Paciente.objects.filter(familiares_cuidadores__user=user)
+
+        # Filtra pacientes autorizados para o usuário
+        autorizacoes = Autorizacao.objects.filter(email=user.email, autorizado=True)
+        pacientes_autorizados = Paciente.objects.filter(id__in=[autorizacao.paciente.id for autorizacao in autorizacoes])
+
+        # Combina os dois conjuntos de pacientes
+        pacientes = pacientes | pacientes_autorizados
+
+        # Define o queryset do campo 'paciente' para mostrar apenas os pacientes autorizados
+        form.fields['paciente'].queryset = pacientes.distinct()
+
+        return form
+
+    def form_valid(self, form):
+        # Associa o médico (usuário logado) ao campo 'medico'
+     
+        
+        return super().form_valid(form)
+
+class ConsultaUpdateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, UpdateView):
     model = Consulta
     form_class = ConsultaForm
     template_name = 'consultas/consulta_form.html'
     success_url = reverse_lazy('consulta_list')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        user = self.request.user
+
+        # Filtra pacientes associados ao usuário (familiares e cuidadores)
+        pacientes = Paciente.objects.filter(familiares_cuidadores__user=user)
+
+        # Filtra pacientes autorizados para o usuário
+        autorizacoes = Autorizacao.objects.filter(email=user.email, autorizado=True)
+        pacientes_autorizados = Paciente.objects.filter(id__in=[autorizacao.paciente.id for autorizacao in autorizacoes])
+
+        # Combina os dois conjuntos de pacientes
+        pacientes = pacientes | pacientes_autorizados
+
+        # Define o queryset do campo 'paciente' para mostrar apenas os pacientes autorizados
+        form.fields['paciente'].queryset = pacientes.distinct()
+
+        # Verifica se o paciente associado à consulta ainda é autorizado para o usuário
+        paciente_atual = self.get_object().paciente
+        if paciente_atual not in pacientes:
+            # Se o paciente não estiver na lista de pacientes autorizados, lança um erro
+            raise PermissionDenied("Você não tem permissão para editar esta consulta para o paciente selecionado.")
+
+        return form
+
+    def form_valid(self, form):
+        form.instance.autor = self.request.user
+        return super().form_valid(form)
+
 
 class ConsultaDeleteView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin ,DeleteView):
     model = Consulta
@@ -489,7 +655,7 @@ def delete_profile(request, user_id):
 @login_required
 def autorizacao_acesso(request, paciente_id):
     if not hasattr(request.user, 'familiar') or not request.user.familiar.is_admin:
-       raise PermissionDenied
+        raise PermissionDenied
 
     paciente = get_object_or_404(Paciente, id=paciente_id)
     autorizacoes = Autorizacao.objects.filter(paciente=paciente).select_related('paciente')
@@ -559,6 +725,7 @@ def autorizacao_acesso(request, paciente_id):
         'autorizados_info': autorizados_info,
     }
     return render(request, 'common/autorizacao_acesso.html', context)
+
 
 @login_required
 def remover_autorizacao(request, autorizacao_id):
