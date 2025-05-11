@@ -26,4 +26,5 @@ RUN python manage.py collectstatic --noinput || true
 EXPOSE 8000
 
 # Comando para iniciar o servidor
-CMD ["gunicorn", "ApoioSaude.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "TrabalhoWeb.wsgi:application", "--bind", "0.0.0.0:8000"]
+
