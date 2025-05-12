@@ -202,50 +202,72 @@ class PacienteDetailView(LoginRequiredMixin, AllRequiredMixin, DetailView):
     template_name = 'pacientes/paciente_detail.html'
 
     def get_object(self, queryset=None):
+        # Pega o objeto do paciente
+        
         paciente = super().get_object(queryset)
         user = self.request.user
         
-        # Verificar se o usuário tem permissão para acessar o paciente
-        autorizacao = Autorizacao.objects.filter(email=user.email, paciente=paciente, autorizado=True).exists()
-
-        if not autorizacao:
+        # Verificar se o usuário tem permissão para acessar este paciente
+        if not Autorizacao.objects.filter(email=user.email, paciente=paciente, autorizado=True).exists():
             raise PermissionDenied("Você não tem permissão para acessar este paciente.")
-
+        
+        # Retorna o paciente encontrado
         return paciente
 
+    def get_context_data(self, **kwargs):
+        # Pega o contexto padrão da DetailView
+        context = super().get_context_data(**kwargs)
+        
+        # Adiciona o paciente ao contexto
+        context['paciente'] = self.get_object()
+        
+        return context
 
 @login_required
 def create_paciente(request):
-        
-    if request.user.user_type != 'medico':
+    if request.user.user_type != 'medico': 
         if request.method == 'POST':
             form = PacienteForm(request.POST, request.FILES)
             if form.is_valid():
+               
                 paciente = form.save()
+
                 user_role = request.user.user_type
+
+                autorizacao, created = Autorizacao.objects.get_or_create(
+                    email=request.user.email,  
+                    paciente=paciente,         
+                    autorizado=True            
+                )
+
                 if user_role == 'familiar':
                     familiar = Familiar.objects.get(user=request.user)
-                    familiar.is_admin = True  # Definindo como admin
+                    familiar.is_admin = True 
                     familiar.relacao_com_paciente = request.POST.get('relacao_com_paciente')
                     familiar.pacientes.add(paciente)
                     familiar.save()
                 elif user_role == 'cuidador':
                     familiar = Familiar.objects.get(user=request.user)
-                    familiar.is_admin = True  # Definindo como admin
+                    familiar.is_admin = True  
                     familiar.relacao_com_paciente = request.user.user_type
                     familiar.pacientes.add(paciente)
                     familiar.save()
-                return redirect('index')
+
+                messages.success(request, 'Paciente criado com sucesso!')
+                return redirect('index')  
+
         else:
             form = PacienteForm()
     else:
-        raise PermissionDenied
+        raise PermissionDenied  
+
     return render(request, 'pacientes/paciente_form.html', {'form': form})
+
 
 @login_required
 def assign_role(request):
     if not request.user.is_familiar_admin:
-        return redirect('index')  # Redireciona se o usuário não for um familiar admin
+        return redirect('index')  
     
     if request.method == 'POST':
         email = request.POST.get('email')

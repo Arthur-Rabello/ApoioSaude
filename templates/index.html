@@ -30,7 +30,7 @@
                                         <img src="{{ data.paciente.foto_perfil.url }}" alt="Foto de perfil de {{ data.paciente.nome }}" class="profile-pic">
                                     </a>
                                 {% else %}
-                                    <p>Sem foto de perfil.</p>
+                                    <img src="{% static 'img/default_profile.jpg' %}" alt="Foto padrão" class="profile-pic">
                                 {% endif %}
                             </div>
                             <div class="profile-info">
@@ -45,7 +45,6 @@
                         <ul class="patient-notes" style="display:none;">
                             {% for nota in data.notas %}
                             <li data-autor="{{ nota.autor.username }}">{{ nota.data_hora|date:"d/m/Y H:i" }} - {{ nota.conteudo }}</li>
-
                             {% endfor %}
                         </ul>
                         <ul class="patient-medications" style="display:none;">
@@ -73,12 +72,12 @@
                                     {% if data.paciente.foto_perfil %}
                                         <img src="{{ data.paciente.foto_perfil.url }}" alt="Foto de perfil de {{ data.paciente.nome }}" class="mini-profile-pic">
                                     {% else %}
-                                        <img src="{% static 'img/default-profile.png' %}" alt="Sem foto" class="mini-profile-pic">
+                                        <img src="{% static 'img/default_profile.jpg' %}" alt="Sem foto" class="mini-profile-pic">
                                     {% endif %}
                                     <p>{{ data.paciente.nome }}</p>
                                 </div>
                             {% endfor %}
-                            <div class ="mini-add-patient-card" id="add-patient-card">
+                            <div class="mini-add-patient-card" id="add-patient-card">
                                 <a href="{% url 'create_paciente' %}">
                                     <div class="add-icon">+</div>
                                 </a>
@@ -87,9 +86,9 @@
                         <div id="next-patient"></div>
                     </div>
                 </div>
-                {% else%}
+                {% else %}
                     <p class="no-patients-message">Você ainda não possui pacientes cadastrados. <a href="{% url 'create_paciente' %}">Adicione um paciente.</a></p>
-                {%endif%}
+                {% endif %}
             </div>
             
             {% if user_type in 'familiar' or 'cuidador' %}
@@ -125,8 +124,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            var selectedPatientId = localStorage.getItem('selectedPatient');
             var currentPatientIndex = 0;
-            var currentCardIndex = 0;
             var patients = document.querySelectorAll('.patient-card');
             var miniPatientCards = document.querySelectorAll('.mini-patient-card, .mini-add-patient-card');
             var miniAddPatientCard = document.querySelector('.mini-add-patient-card');
@@ -135,7 +134,7 @@
             var medicationsContainer = document.getElementById('medications-container');
             var calendarEl = document.getElementById('calendar');
             var cardsToShow = 2;
-        
+
             function renderPatient(index) {
                 patients.forEach(function(patient, idx) {
                     if (idx === index) {
@@ -152,7 +151,7 @@
                 hideCurrentMiniCard(index);
                 showCards();
             }
-        
+
             function renderNotes(patient) {
                 var notes = patient.querySelectorAll('.patient-notes li');
                 notesContainer.innerHTML = '';
@@ -185,24 +184,19 @@
                     }
                 });
             }
-        
+
             function renderMedications(patient) {
                 var medications = patient.querySelectorAll('.patient-medications li');
                 medicationsContainer.innerHTML = '';
         
                 medications.forEach(function(medication, index) {
-                    // Clone o item da lista de medicamentos
                     var clonedMedication = medication.cloneNode(true);
-        
-                    // Adicione a classe medication-item
                     clonedMedication.classList.add('medication-item');
         
-                    // Adicione a borda inferior, exceto para o último item
                     if (index < medications.length - 1) {
                         clonedMedication.style.borderBottom = '1px solid #ccc';
                     }
         
-                    // Adicione o item clonado ao container de medicamentos
                     medicationsContainer.appendChild(clonedMedication);
                 });
             }
@@ -244,19 +238,19 @@
                 });
                 calendar.render();
             }
-        
+
             function updateAuthorizationLink(index) {
                 var patientId = patients[index].dataset.pacienteId;
                 var link = document.getElementById('autorizacao-link');
                 link.href = "{% url 'autorizacao_acesso' '0' %}".replace('0', patientId);
             }
-        
+
             function updateAuthorizationList(index) {
                 var patientId = patients[index].dataset.pacienteId;
                 var link = document.getElementById('autorizacao-list');
                 link.href = "{% url 'autorizado_list' '0' %}".replace('0', patientId);
             }
-        
+
             function hideCurrentMiniCard(index) {
                 miniPatientCards.forEach(function(card) {
                     if (patients[index].dataset.pacienteId === card.dataset.pacienteId) {
@@ -266,7 +260,7 @@
                     }
                 });
             }
-        
+
             function showCards() {
                 let cardsShown = 0;
                 miniPatientCards.forEach(function(card, idx) {
@@ -282,46 +276,56 @@
                     }
                 });
             }
-        
+
             function showNextCards() {
                 if (currentCardIndex + cardsToShow < miniPatientCards.length - 1) {
                     currentCardIndex++;
                 } else {
-                    currentCardIndex = 0; // Volta ao primeiro card
+                    currentCardIndex = 0;
                 }
                 showCards();
             }
-        
+
             function showPreviousCards() {
                 if (currentCardIndex > 0) {
                     currentCardIndex--;
                 } else {
-                    currentCardIndex = miniPatientCards.length - cardsToShow - 1; // Vai ao último card
+                    currentCardIndex = miniPatientCards.length - cardsToShow - 1;
                 }
                 showCards();
             }
-        
+
             document.getElementById('next-patient').addEventListener('click', showNextCards);
             document.getElementById('previous-patient').addEventListener('click', showPreviousCards);
-        
+
             miniPatientCards.forEach(function(card) {
-                card.addEventListener('click', function() {
-                    currentPatientIndex = Array.from(patients).findIndex(patient => patient.dataset.pacienteId === card.dataset.pacienteId);
-                    renderPatient(currentPatientIndex);
-                });
+                if (!card.classList.contains('mini-add-patient-card')) {
+                    card.addEventListener('click', function() {
+                        localStorage.setItem('selectedPatient', card.dataset.pacienteId);
+                        currentPatientIndex = Array.from(patients).findIndex(patient => patient.dataset.pacienteId === card.dataset.pacienteId);
+                        renderPatient(currentPatientIndex);
+                    });
+                }
             });
-        
+
+
+            // Verifica se há um paciente selecionado no localStorage
+            if (selectedPatientId) {
+                currentPatientIndex = Array.from(patients).findIndex(patient => patient.dataset.pacienteId === selectedPatientId);
+                if (currentPatientIndex !== -1) {
+                    renderPatient(currentPatientIndex);
+                }
+            }
+
             renderPatient(currentPatientIndex);
         });
-        
+
         $(document).ready(function() {
             $('#add-patient-card').click(function(event) {
                 event.preventDefault();
                 window.location.href = $(this).find('a').attr('href');
             });
         });
-        
-        
     </script>
 </body>
 </html>
