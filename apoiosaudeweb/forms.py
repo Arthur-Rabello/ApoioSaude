@@ -106,6 +106,7 @@ class FamiliarRegisterForm(forms.ModelForm):
             'informacoes_contato': 'Informações de contato',
         }
         widgets = {
+        'nome': forms.TextInput(attrs={'placeholder': 'Digite seu nome completo'}),
         'informacoes_contato': forms.TextInput(attrs={
             'id': 'id_informacoes_contato',
             'placeholder': '(11) 99999-8888'
@@ -128,7 +129,10 @@ class MedicoRegisterForm(forms.ModelForm):
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Nome completo do médico'}),
             'especialidade': forms.TextInput(attrs={'placeholder': 'Ex: Cardiologista, Pediatra'}),
-            'informacoes_contato': forms.TextInput(attrs={'placeholder': 'Informações de contato do médico (telefone)'}),
+            'informacoes_contato': forms.TextInput(attrs={
+            'id': 'id_informacoes_contato',
+            'placeholder': '(11) 99999-8888'
+            }),
             
         }
 
