@@ -4,7 +4,7 @@ from django.conf.urls import handler404, handler500, handler403
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .views import register,trigger_error, login, perfil_generico, resend_verification_email, verify_email, editar_perfil, error_404_view, autorizado_list_view, error_500_view, logout_view, autorizacao_acesso, delete_profile, permission_denied_view, remover_autorizacao
+from .views import logout_confirm,register,trigger_error, login, perfil_generico, resend_verification_email, verify_email, editar_perfil, error_404_view, autorizado_list_view, error_500_view, logout_view, autorizacao_acesso, delete_profile, permission_denied_view, remover_autorizacao
 
 
 urlpatterns = [
@@ -12,6 +12,7 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('login/', login, name='login'),
     path('logout/', logout_view, name='logout'),
+    path('logout/confirm', logout_confirm, name='logout_confirm'),
     path('index/', views.index, name='index'),
     path('trigger-error/', trigger_error, name='trigger_error'),
     path('permission_denied/', permission_denied_view, name='permission_denied'),

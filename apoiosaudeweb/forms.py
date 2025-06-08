@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Consulta, Paciente, Familiar, Medico, CustomUser, NotaObservacao, Autorizacao, Medicamento
+import re
 
 TIPOS_SANGUINEOS = [
     ('A+', 'A+'),
@@ -21,13 +22,22 @@ class ConsultaForm(forms.ModelForm):
         widget=forms.TimeInput(attrs={'type': 'time', 'placeholder': 'Escolha a hora da consulta'})
     )
 
+    descricao = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Descreva a consulta ou os motivos da visita'})
+    )
+
     class Meta:
         model = Consulta
         fields = ['data', 'hora', 'paciente', 'medico', 'descricao']
-        widgets = {
-            'descricao': forms.Textarea(attrs={'placeholder': 'Descreva a consulta ou os motivos da visita'})
-        }
+        
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
 
+        if user:
+            médicos_vinculados = Medico.objects.filter(familiar__pacientes__user=user)
+            self.fields['medico'].queryset = médicos_vinculados
+            
 class PacienteForm(forms.ModelForm):
     tipo_sanguineo = forms.ChoiceField(
         choices=TIPOS_SANGUINEOS,
@@ -71,6 +81,9 @@ class CustomUserCreationForm(UserCreationForm):
         labels = {
             'username': 'Nome de usuário',
         }
+        widgets = {
+            'username': forms.TextInput(attrs={'placeholder': 'Digite um nome de usuário'}),
+        }
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -89,19 +102,34 @@ class FamiliarRegisterForm(forms.ModelForm):
     class Meta:
         model = Familiar
         fields = ['nome', 'informacoes_contato']
-        widgets = {
-            'nome': forms.TextInput(attrs={'placeholder': 'Nome completo do familiar'}),
-            'informacoes_contato': forms.Textarea(attrs={'placeholder': 'Informações de contato (telefone, e-mail)'}),
+        labels = {
+            'informacoes_contato': 'Informações de contato',
         }
+        widgets = {
+        'informacoes_contato': forms.TextInput(attrs={
+            'id': 'id_informacoes_contato',
+            'placeholder': '(11) 99999-8888'
+        }),
+}
+
+    def clean_informacoes_contato(self):
+        contato = self.cleaned_data.get('informacoes_contato', '')
+        if not re.fullmatch(r'\d{10,11}', contato):
+            raise forms.ValidationError("Digite apenas números. O telefone deve ter 10 ou 11 dígitos (com DDD).")
+        return contato
 
 class MedicoRegisterForm(forms.ModelForm):
     class Meta:
         model = Medico
         fields = ['nome', 'especialidade', 'informacoes_contato']
+        labels = {
+            'informacoes_contato': 'Informações de contato',
+        }
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Nome completo do médico'}),
             'especialidade': forms.TextInput(attrs={'placeholder': 'Ex: Cardiologista, Pediatra'}),
-            'informacoes_contato': forms.Textarea(attrs={'placeholder': 'Informações de contato do médico (telefone, e-mail)'}),
+            'informacoes_contato': forms.TextInput(attrs={'placeholder': 'Informações de contato do médico (telefone)'}),
+            
         }
 
 class NotaObservacaoForm(forms.ModelForm):

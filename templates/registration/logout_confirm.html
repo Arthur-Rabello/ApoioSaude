@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Deletar Paciente</title>
+    <title>Logout Usuário</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
     <link rel="stylesheet" href="{% static 'css/button.css' %}">
     <link rel="stylesheet" href="{% static 'css/confirm_delete.css' %}">
@@ -12,11 +12,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Deletar Paciente</h1>
-        <p>Tem certeza que deseja deletar este Paciente?</p>
+        <h1>Você está saindo</h1>
+        <p>Tem certeza que deseja desconectar do seu perfil?</p>
         <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-delete">Deletar</button>
+            <button type="submit" class="btn btn-delete">Desconectar</button>
         </form>
         <button onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary">Voltar à Lista</button>
     </div>

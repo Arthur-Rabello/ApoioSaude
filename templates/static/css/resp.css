@@ -1,0 +1,192 @@
+/* ==== Ajustes gerais para responsividade ==== */
+
+/* Tornar containers com largura máxima flexível */
+.register-container,
+.login-container,
+.container,
+.content,
+.profile-container {
+  width: 90%;
+  max-width: 600px; /* ou o máximo desejado */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Ajustar fontes para telas menores */
+h1, h2, h3 {
+  font-size: 1.5rem;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select,
+textarea,
+button {
+  font-size: 1rem;
+}
+
+/* Ajuste flex para botões */
+.button-group,
+.buttons,
+.login-group {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Botões com largura flexível */
+.btn,
+button,
+.btn2,
+.login-link button {
+  width: 100%;
+  max-width: none;
+}
+
+/* Inputs com largura total e box-sizing */
+input,
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Imagens de logo e perfil com tamanho máximo e responsivo */
+.logo,
+.profile-header .profile-pic,
+.mini-patient-card img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ajustar container de input com ícone para telas pequenas */
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon input {
+  padding-right: 35px; /* mantem espaço para o ícone */
+  width: 100%;
+}
+
+.input-with-icon .toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+/* ========= Media Queries ========= */
+
+/* Tablets e telas médias: 768px e menos */
+@media (max-width: 768px) {
+
+  /* Container com largura maior proporcionalmente */
+  .register-container,
+  .login-container,
+  .container,
+  .content,
+  .profile-container {
+    max-width: 90%;
+    padding: 15px;
+  }
+
+  /* Ajusta títulos para ficar menores */
+  h1, h2, h3 {
+    font-size: 1.3rem;
+  }
+
+  /* Botões ocupam toda largura e ficam um embaixo do outro */
+  .button-group,
+  .buttons,
+  .login-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn,
+  button,
+  .btn2,
+  .login-link button {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Inputs maiores para toque confortável */
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  select,
+  textarea {
+    padding: 12px;
+    font-size: 1.1rem;
+  }
+}
+
+/* Mobile (celulares pequenos): 480px e menos */
+@media (max-width: 480px) {
+
+  /* Reduz margens laterais */
+  body,
+  .register-container,
+  .login-container,
+  .container,
+  .content,
+  .profile-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  /* Títulos ainda menores */
+  h1, h2, h3 {
+    font-size: 1.1rem;
+  }
+
+  /* Menus e listas em coluna */
+  .nav-list {
+    flex-direction: column;
+    margin-left: 0;
+  }
+
+  .nav-link {
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+
+  /* Inputs e botões com padding reduzido */
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  select,
+  textarea {
+    padding: 10px;
+    font-size: 1rem;
+  }
+
+  .btn,
+  button,
+  .btn2,
+  .login-link button {
+    padding: 10px;
+    font-size: 1rem;
+  }
+
+  /* Ajustar mini cards para ficarem empilhados */
+  .mini-cards-wrapper {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* Reduz tamanho das imagens */
+  .logo,
+  .profile-header .profile-pic,
+  .mini-patient-card img {
+    width: 80px;
+    height: auto;
+  }
+}

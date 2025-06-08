@@ -1,4 +1,4 @@
-/* css/header.css */
+/* header.css */
 
 .navbar {
     display: flex;
@@ -6,7 +6,7 @@
     align-items: center;
     padding: 10px 20px;
     background-color: #232EB8;
-    
+    position: relative; /* para posicionar dropdowns e hamburger */
 }
 
 .navbar .menu {
@@ -59,8 +59,9 @@
     font-size: 20px;
     transition: background-color 0.3s;
 }
-.img1{
-    width: 45px; /* Adjust this value as needed */
+
+.img1 {
+    width: 45px;
     height: auto;
     display: flex;
     margin-right: 30px;
@@ -78,6 +79,7 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     min-width: 160px;
     border-radius: 5px;
+    z-index: 1000;
 }
 
 .dropdown-menu a {
@@ -92,4 +94,90 @@
 
 .dropdown-menu a:hover {
     background-color: #ddd;
+}
+
+/* === MENU HAMBURGUER === */
+
+.hamburger {
+    display: none; /* escondido por padrão */
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* para garantir que nav-list fica acima do conteúdo */
+.nav-list.active {
+    display: flex !important;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background-color: #232EB8;
+    border-radius: 0 0 8px 8px;
+    padding: 0;
+    margin: 0;
+    z-index: 1100;
+}
+
+/* dropdowns ajustados no mobile */
+@media (max-width: 767px) {
+    .nav-list {
+        display: none !important;
+        flex-direction: column;
+        width: 100%;
+        margin-left: 0;
+        margin-top: 0;
+        background-color: #232EB8;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        border-radius: 0 0 8px 8px;
+        padding: 0;
+        z-index: 1100;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .nav-link {
+        width: 100%;
+        padding: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        font-size: 18px;
+    }
+
+    .nav-link a {
+        font-size: 18px;
+        display: block;
+        width: 100%;
+        padding: 10px 0;
+    }
+
+    .img1 {
+        margin-right: 10px;
+        width: 35px;
+    }
+
+    /* Ajustar dropdowns para ocuparem a largura total no mobile */
+    .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        background-color: #1c288a;
+        border-radius: 0;
+        min-width: 100%;
+        padding-left: 10px;
+        margin-bottom: 10px;
+    }
+    .dropdown-menu a {
+        color: white;
+        font-size: 16px;
+        border-bottom: none;
+        padding: 8px 0;
+    }
+    .dropdown-menu a:hover {
+        background-color: #3A43BF;
+    }
 }

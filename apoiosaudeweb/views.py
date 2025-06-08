@@ -34,10 +34,12 @@ def register(request):
                     user.save()
                     familiar_profile = familiar_form.save(commit=False)
                     familiar_profile.user = user
+                    familiar_profile.tipo = 'familiar'
                     familiar_profile.save()
                     send_verification_email(user, request)
                     messages.success(request, 'Conta criada com sucesso. Verifique seu e-mail.')
                     return redirect('login')
+
             elif user_type == 'medico':
                 if medico_form.is_valid():
                     user.user_type = user_type
@@ -48,12 +50,20 @@ def register(request):
                     send_verification_email(user, request)
                     messages.success(request, 'Conta criada com sucesso. Verifique seu e-mail.')
                     return redirect('login')
+
             elif user_type == 'cuidador':
                 user.user_type = user_type
                 user.save()
+                cuidador_profile = Familiar.objects.create(
+                    user=user,
+                    nome=user.username,  # ou peça o nome num campo adicional se quiser
+                    tipo='cuidador',
+                    is_admin=False  # ajustável conforme lógica
+                )
                 send_verification_email(user, request)
                 messages.success(request, 'Conta criada com sucesso. Verifique seu e-mail.')
                 return redirect('login')
+
         else:
             messages.error(request, 'Por favor, corrija os erros abaixo.')
     else:
@@ -66,7 +76,6 @@ def register(request):
         'familiar_form': familiar_form,
         'medico_form': medico_form,
     })
-
 
 def login(request):
     if request.method == 'POST':
@@ -174,6 +183,13 @@ def logout_view(request):
     messages.success(request, 'Você foi desconectado com sucesso. Até logo!')
     return redirect('login')
 
+def logout_confirm(request):
+    if request.method == 'POST':
+        logout(request)
+        messages.success(request, 'Você foi desconectado com sucesso. Até logo!')
+        return redirect('login')
+    return render(request, 'registration/logout_confirm.html')
+
 class PacienteListView(LoginRequiredMixin, AllRequiredMixin, ListView):
     model = Paciente
     template_name = 'pacientes/paciente_list.html'
@@ -229,8 +245,9 @@ def create_paciente(request):
         if request.method == 'POST':
             form = PacienteForm(request.POST, request.FILES)
             if form.is_valid():
-               
-                paciente = form.save()
+                paciente = form.save(commit=False)
+                paciente.responsavel = request.user  # 👈 Define o usuário como responsável
+                paciente.save()
 
                 user_role = request.user.user_type
 
@@ -240,34 +257,26 @@ def create_paciente(request):
                     autorizado=True            
                 )
 
-                if user_role == 'familiar':
+                if user_role in ['familiar', 'cuidador']:
                     familiar = Familiar.objects.get(user=request.user)
                     familiar.is_admin = True 
-                    familiar.relacao_com_paciente = request.POST.get('relacao_com_paciente')
-                    familiar.pacientes.add(paciente)
-                    familiar.save()
-                elif user_role == 'cuidador':
-                    familiar = Familiar.objects.get(user=request.user)
-                    familiar.is_admin = True  
-                    familiar.relacao_com_paciente = request.user.user_type
+                    familiar.relacao_com_paciente = request.POST.get('relacao_com_paciente') or user_role
                     familiar.pacientes.add(paciente)
                     familiar.save()
 
                 messages.success(request, 'Paciente criado com sucesso!')
                 return redirect('index')  
-
         else:
             form = PacienteForm()
     else:
-        raise PermissionDenied  
+        raise PermissionDenied  # Caso o usuário seja médico
 
     return render(request, 'pacientes/paciente_form.html', {'form': form})
-
 
 @login_required
 def assign_role(request):
     if not request.user.is_familiar_admin:
-        return redirect('index')  
+        return redirect('index')  # Redireciona se o usuário não for um familiar admin
     
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -297,7 +306,7 @@ class PacienteUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
 class PacienteDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
     model = Paciente
     template_name = 'pacientes/paciente_confirm_delete.html'
-    success_url = reverse_lazy('paciente_list')
+    success_url = reverse_lazy('index')
 
 
 class FamiliarDetailView(LoginRequiredMixin, AllRequiredMixin, DetailView):
@@ -608,12 +617,27 @@ class ConsultaCreateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, Crea
         # Define o queryset do campo 'paciente' para mostrar apenas os pacientes autorizados
         form.fields['paciente'].queryset = pacientes.distinct()
 
+        # Verifica os médicos autorizados para os pacientes selecionados
+        # Obtém os médicos associados aos pacientes autorizados
+        autorizados_medicos = Medico.objects.filter(pacientes__in=pacientes).distinct()
+
+        # Define o queryset do campo 'medico' para mostrar apenas médicos autorizados
+        form.fields['medico'].queryset = autorizados_medicos
+
         return form
 
     def form_valid(self, form):
-        # Associa o médico (usuário logado) ao campo 'medico'
-     
+        paciente = form.cleaned_data['paciente']
+        medico = form.cleaned_data['medico']
         
+        if not medico:
+            return super().form_valid(form)
+
+        # Verifica se o médico está autorizado para o paciente
+        if not Autorizacao.objects.filter(email=medico.user.email, paciente=paciente, autorizado=True).exists():
+            form.add_error('medico', 'Este médico não está autorizado a consultar este paciente.')
+            return self.form_invalid(form)
+
         return super().form_valid(form)
 
 class ConsultaUpdateView(LoginRequiredMixin, CuidadorFamiliarRequiredMixin, UpdateView):
@@ -714,6 +738,10 @@ def autorizacao_acesso(request, paciente_id):
         autorizacao, created = Autorizacao.objects.get_or_create(email=email, paciente=paciente)
         autorizacao.autorizado = autorizado
         autorizacao.save()
+
+        if user.user_type == 'medico' and autorizado:
+            medico = Medico.objects.get(user=user)
+            medico.pacientes.add(paciente)
 
         if user.user_type == 'familiar' and relacao_com_paciente:
             familiar = Familiar.objects.get(user=user)

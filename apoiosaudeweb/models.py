@@ -20,6 +20,7 @@ class CustomUser(AbstractUser):
         return self.username
 
 class Paciente(models.Model):
+    responsavel = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='pacientes_responsaveis')
     nome = models.CharField(max_length=100)
     data_nascimento = models.DateField(null=True, blank=True)
     tipo_sanguineo = models.CharField(max_length=10)

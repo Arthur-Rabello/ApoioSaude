@@ -25,13 +25,13 @@
                     <div class="patient-card" data-paciente-id="{{ data.paciente.id }}" style="display:none;">
                         <div class="profile-container">
                             <div class="profile-header">
-                                {% if data.paciente.foto_perfil %}
-                                    <a href="{% url 'paciente_detail' data.paciente.id %}">
+                                <a href="{% url 'paciente_detail' data.paciente.id %}">
+                                    {% if data.paciente.foto_perfil %}
                                         <img src="{{ data.paciente.foto_perfil.url }}" alt="Foto de perfil de {{ data.paciente.nome }}" class="profile-pic">
-                                    </a>
-                                {% else %}
-                                    <img src="{% static 'img/default_profile.jpg' %}" alt="Foto padrão" class="profile-pic">
-                                {% endif %}
+                                    {% else %}
+                                        <img src="{% static 'img/default_profile.jpg' %}" alt="Foto padrão" class="profile-pic">
+                                    {% endif %}
+                                </a>
                             </div>
                             <div class="profile-info">
                                 <h2 class="profile-info h2">{{ data.paciente.nome }}</h2>
@@ -308,16 +308,28 @@
                 }
             });
 
-
-            // Verifica se há um paciente selecionado no localStorage
             if (selectedPatientId) {
                 currentPatientIndex = Array.from(patients).findIndex(patient => patient.dataset.pacienteId === selectedPatientId);
                 if (currentPatientIndex !== -1) {
                     renderPatient(currentPatientIndex);
+                } else {
+                    
+                    currentPatientIndex = 0;
+                    if (patients.length > 0) {
+                        selectedPatientId = patients[0].dataset.pacienteId;
+                        localStorage.setItem('selectedPatient', selectedPatientId);
+                    }
+                    renderPatient(currentPatientIndex);
                 }
+            } else {
+                currentPatientIndex = 0;
+                if (patients.length > 0) {
+                    selectedPatientId = patients[0].dataset.pacienteId;
+                    localStorage.setItem('selectedPatient', selectedPatientId);
+                }
+                renderPatient(currentPatientIndex);
             }
 
-            renderPatient(currentPatientIndex);
         });
 
         $(document).ready(function() {

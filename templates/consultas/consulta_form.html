@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>{% if object %}Editar Consulta{% else %}Adicionar Consulta{% endif %}</h1>
+        <h1>{% if form.instance.id %}Editar Consulta{% else %}Adicionar Consulta{% endif %}</h1>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}

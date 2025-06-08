@@ -15,7 +15,7 @@ body {
     margin-left: 150px;
     justify-content: space-between;
     width: 100%;
-    max-width: 500px;
+    max-width: 550px; /* Aumentado de 500px para 650px */
     padding: 20px;
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -48,13 +48,15 @@ form {
 }
 
 input[type="text"], input[type="password"] {
-    width: calc(100% - 40px);
+    width: 100%; /* Usar 100% do container pai */
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 10px;
     text-align: center;
     font-size: 16px;
+    box-sizing: border-box; /* Para incluir padding na largura */
+    height: 36px;
 }
 
 .button-group {
@@ -141,3 +143,47 @@ input[type="text"], input[type="password"] {
     justify-content: center;
     align-items: center;
 }
+.inputs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espaçamento vertical entre os inputs */
+    width: 100%;
+}
+
+.inputs-container > input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.password-container {
+  position: relative;
+  text: center;
+  width: 100%;
+}
+
+.password-container input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 36px;
+  font-size: 16px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.password-container img {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+

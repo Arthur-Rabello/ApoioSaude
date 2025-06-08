@@ -2,11 +2,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login - Apoio Saúde</title>
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link rel="icon" type="image/x-icon" href="{% static 'img/logo.png' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo.png' %}" />
 </head>
 <body>
 
@@ -30,15 +30,27 @@
 
     <div class="login-container">
         <div class="logo-container">
-            <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo">
+            <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo" />
             <h2>Apoio Saúde</h2>
         </div>
         <form method="POST">
             {% csrf_token %}
-            <input type="text" name="username" placeholder="Login" required>
-            <input type="password" name="password" placeholder="Senha" required>
+            <div class="inputs-container">
+                <input type="text" name="username" placeholder="Login" required />
+    
+                <div class="password-container">
+                    <input id="password" type="password" name="password" placeholder="Senha" required />
+                    <img
+                        id="togglePassword"
+                        src="{% static 'img/olho.png' %}"
+                        alt="Mostrar senha"
+                        tabindex="0"
+                    />
+                </div>
+            </div>
+
             <div class="a-group">
-                <a class="a1">Esqueceu sua senha?</a> 
+                <a class="a1">Esqueceu sua senha?</a>
                 <a href="{% url 'password_reset' %}" class="btn2">Clique aqui</a>
             </div>
             <div class="button-group">
@@ -47,5 +59,32 @@
             </div>
         </form>
     </div>
+
+    <script>
+      const togglePassword = document.querySelector('#togglePassword');
+      const password = document.querySelector('#password');
+
+      togglePassword.addEventListener('click', function () {
+          const isPassword = password.getAttribute('type') === 'password';
+          password.setAttribute('type', isPassword ? 'text' : 'password');
+
+          // Alterna a imagem e o alt
+          if (isPassword) {
+            this.src = "{% static 'img/olho (1).png' %}";
+            this.alt = "Ocultar senha";
+          } else {
+            this.src = "{% static 'img/olho.png' %}";
+            this.alt = "Mostrar senha";
+          }
+      });
+
+      // Acessibilidade: toggle via teclado
+      togglePassword.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              this.click();
+          }
+      });
+    </script>
 </body>
 </html>

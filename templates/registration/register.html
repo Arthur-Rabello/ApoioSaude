@@ -30,9 +30,18 @@
                 {% endif %}
             </div>
 
-            <div class="form-group">
+            <div class="form-group password-wrapper">
                 {{ user_form.password1.label_tag }}
-                {{ user_form.password1 }}
+                <div class="input-with-icon">
+                    {{ user_form.password1 }}
+                    <img
+                    src="{% static 'img/olho.png' %}"
+                    alt="Mostrar senha"
+                    class="toggle-password"
+                    tabindex="0"
+                    data-target="id_password1"
+                    />
+                </div>
                 <ul class="password-help" id="password-help-1">
                     <li class="invalid" id="password-criteria-1">Sua senha não pode ser muito parecida com o resto das suas informações pessoais.</li>
                     <li class="invalid" id="password-criteria-2">Sua senha precisa conter pelo menos 8 caracteres.</li>
@@ -43,10 +52,19 @@
                     <div class="error">{{ user_form.password1.errors }}</div>
                 {% endif %}
             </div>
-            
-            <div class="form-group">
+
+            <div class="form-group password-wrapper">
                 {{ user_form.password2.label_tag }}
-                {{ user_form.password2 }}
+                <div class="input-with-icon">
+                    {{ user_form.password2 }}
+                    <img
+                    src="{% static 'img/olho.png' %}"
+                    alt="Mostrar senha"
+                    class="toggle-password"
+                    tabindex="0"
+                    data-target="id_password2"
+                    />
+                </div>
                 <ul class="password-help" id="password-help-2">
                     <li class="invalid" id="password-criteria-5">As senhas devem coincidir.</li>
                 </ul>
@@ -54,6 +72,7 @@
                     <div class="error">{{ user_form.password2.errors }}</div>
                 {% endif %}
             </div>
+
 
             <div class="form-group">
                 {{ user_form.user_type.label_tag }} 
@@ -76,123 +95,194 @@
 
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            function getFamiliarForm() {
-                return `
-                   {% for field in familiar_form %}
-                       <div class="form-group">
-                           {{ field.label_tag }} {{ field }}
-                           {% if field.help_text %}
-                               <small class="form-text text-muted">{{ field.help_text }}</small>
-                           {% endif %}
-                           {% if field.errors %}
-                               <div class="error">{{ field.errors }}</div>
-                           {% endif %}
-                       </div>
-                   {% endfor %}
-                `;
-            }
+document.addEventListener('DOMContentLoaded', function () {
 
-            function getMedicoForm() {
-                return `
-                    {% for field in medico_form %}
-                        <div class="form-group">
-                            {{ field.label_tag }} {{ field }}
-                            {% if field.help_text %}
-                                <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-                            {% if field.errors %}
-                               <div class="error">{{ field.errors }}</div>
-                           {% endif %}
-                        </div>
-                    {% endfor %}
-                `;
-            }
+    function getFamiliarForm() {
+        return `
+           {% for field in familiar_form %}
+               <div class="form-group">
+                   {{ field.label_tag }} {{ field }}
+                   {% if field.help_text %}
+                       <small class="form-text text-muted">{{ field.help_text }}</small>
+                   {% endif %}
+                   {% if field.errors %}
+                       <div class="error">{{ field.errors }}</div>
+                   {% endif %}
+               </div>
+           {% endfor %}
+        `;
+    }
 
-            function toggleForms() {
-                var userType = document.getElementById('id_user_type').value;
-                var dynamicForm = document.getElementById('dynamic-form');
-                if (userType === 'medico') {
-                    dynamicForm.innerHTML = getMedicoForm();
+    function getMedicoForm() {
+        return `
+            {% for field in medico_form %}
+                <div class="form-group">
+                    {{ field.label_tag }} {{ field }}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                       <div class="error">{{ field.errors }}</div>
+                   {% endif %}
+                </div>
+            {% endfor %}
+        `;
+    }
+
+    function aplicarMascaraTelefone() {
+        const telefoneInput = document.getElementById('id_informacoes_contato');
+        if (!telefoneInput) return;
+
+        telefoneInput.addEventListener('input', function () {
+            let valor = this.value.replace(/\D/g, '').slice(0, 11);
+            let formatado = '';
+
+            if (valor.length >= 2) {
+                formatado += `(${valor.slice(0, 2)}) `;
+                if (valor.length >= 7) {
+                    formatado += `${valor.slice(2, 7)}-${valor.slice(7)}`;
                 } else {
-                    dynamicForm.innerHTML = getFamiliarForm();
+                    formatado += valor.slice(2);
                 }
-
-                
-                if (userType === 'cuidador') {
-                    var relacaoComPacienteField = document.getElementById('relacao-com-paciente');
-                    if (relacaoComPacienteField) {
-                        relacaoComPacienteField.style.display = 'none';
-                    }
-                }
+            } else {
+                formatado = valor;
             }
 
-            document.getElementById('id_user_type').addEventListener('change', toggleForms);
-            window.onload = toggleForms;
+            this.value = formatado;
+        });
+    }
 
-           
-            const passwordField1 = document.getElementById('id_password1');
-            const passwordField2 = document.getElementById('id_password2');
-            const helpText1 = document.getElementById('password-help-1');
-            const helpText2 = document.getElementById('password-help-2');
+    function initPasswordToggle() {
+        const toggles = document.querySelectorAll('.toggle-password');
+        toggles.forEach(function(toggle) {
+            toggle.replaceWith(toggle.cloneNode(true));
+        });
 
-            passwordField1.addEventListener('focus', function() {
-                helpText1.classList.add('visible');
-            });
+        const newToggles = document.querySelectorAll('.toggle-password');
+        newToggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                if (!input) return;
 
-            passwordField1.addEventListener('blur', function() {
-                helpText1.classList.remove('visible');
-            });
+                const isPassword = input.getAttribute('type') === 'password';
+                input.setAttribute('type', isPassword ? 'text' : 'password');
 
-            passwordField1.addEventListener('input', function() {
-                validatePassword1(passwordField1.value);
-                validatePassword2(passwordField1.value, passwordField2.value);
-            });
-
-            passwordField2.addEventListener('focus', function() {
-                helpText2.classList.add('visible');
-            });
-
-            passwordField2.addEventListener('blur', function() {
-                helpText2.classList.remove('visible');
-            });
-
-            passwordField2.addEventListener('input', function() {
-                validatePassword2(passwordField1.value, passwordField2.value);
-            });
-
-            function validatePassword1(password) {
-                const criteria = [
-                    /.{8,}/, 
-                    /.*[A-Z].*/, 
-                    /.*[a-z].*/, 
-                    /.*[0-9].*/, 
-                    /.*[^A-Za-z0-9].*/ 
-                ];
-
-                criteria.forEach((regex, index) => {
-                    const element = document.getElementById(`password-criteria-${index + 1}`);
-                    if (regex.test(password)) {
-                        element.classList.add('valid');
-                        element.classList.remove('invalid');
-                    } else {
-                        element.classList.add('invalid');
-                        element.classList.remove('valid');
-                    }
-                });
-            }
-
-            function validatePassword2(password1, password2) {
-                const element = document.getElementById('password-criteria-5');
-                if (password1 === password2) {
-                    element.classList.add('valid');
-                    element.classList.remove('invalid');
+                if (isPassword) {
+                    this.src = "{% static 'img/olho (1).png' %}";
+                    this.alt = "Ocultar senha";
                 } else {
-                    element.classList.add('invalid');
-                    element.classList.remove('valid');
+                    this.src = "{% static 'img/olho.png' %}";
+                    this.alt = "Mostrar senha";
                 }
+            });
+
+            toggle.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+        });
+    }
+
+    function toggleForms() {
+        var userType = document.getElementById('id_user_type').value;
+        var dynamicForm = document.getElementById('dynamic-form');
+
+        if (userType === 'medico') {
+            dynamicForm.innerHTML = getMedicoForm();
+        } else {
+            dynamicForm.innerHTML = getFamiliarForm();
+        }
+
+        if (userType === 'cuidador') {
+            var relacaoComPacienteField = document.getElementById('relacao-com-paciente');
+            if (relacaoComPacienteField) {
+                relacaoComPacienteField.style.display = 'none';
+            }
+        }
+
+        aplicarMascaraTelefone();
+        initPasswordToggle();
+        initPasswordHelpValidation();
+    }
+
+    document.getElementById('id_user_type').addEventListener('change', toggleForms);
+    window.onload = toggleForms;
+    initPasswordToggle();
+
+    const passwordField1 = document.getElementById('id_password1');
+    const passwordField2 = document.getElementById('id_password2');
+    const helpText1 = document.getElementById('password-help-1');
+    const helpText2 = document.getElementById('password-help-2');
+
+    function initPasswordHelpValidation() {
+        if (!passwordField1 || !passwordField2 || !helpText1 || !helpText2) return;
+
+        passwordField1.addEventListener('focus', function() {
+            helpText1.classList.add('visible');
+        });
+
+        passwordField1.addEventListener('blur', function() {
+            helpText1.classList.remove('visible');
+        });
+
+        passwordField1.addEventListener('input', function() {
+            validatePassword1(passwordField1.value);
+            validatePassword2(passwordField1.value, passwordField2.value);
+        });
+
+        passwordField2.addEventListener('focus', function() {
+            helpText2.classList.add('visible');
+        });
+
+        passwordField2.addEventListener('blur', function() {
+            helpText2.classList.remove('visible');
+        });
+
+        passwordField2.addEventListener('input', function() {
+            validatePassword2(passwordField1.value, passwordField2.value);
+        });
+    }
+
+    function validatePassword1(password) {
+        const criteria = [
+            /.{8,}/, 
+            /.*[A-Z].*/, 
+            /.*[a-z].*/, 
+            /.*[0-9].*/, 
+            /.*[^A-Za-z0-9].*/ 
+        ];
+
+        criteria.forEach((regex, index) => {
+            const element = document.getElementById(`password-criteria-${index + 1}`);
+            if (!element) return;
+            if (regex.test(password)) {
+                element.classList.add('valid');
+                element.classList.remove('invalid');
+            } else {
+                element.classList.add('invalid');
+                element.classList.remove('valid');
             }
         });
-    </script>
+    }
+
+    function validatePassword2(password1, password2) {
+        const element = document.getElementById('password-criteria-5');
+        if (!element) return;
+        if (password1 === password2) {
+            element.classList.add('valid');
+            element.classList.remove('invalid');
+        } else {
+            element.classList.add('invalid');
+            element.classList.remove('valid');
+        }
+    }
+
+    initPasswordHelpValidation();
+});
+</script>
+
 </body>
 </html>
