@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ApoioSaúde{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+
+    <div class="navbar">
+        <nav>
+            <ul class="nav-list">
+                <a href="{% url 'landing_page' %}"><img src="{% static 'img/IconHeader.png' %}" alt="logo" class="img1"></a>
+                <li class="nav-link">
+                    <a href="{% url 'objetivo' %}">Objetivo</a>
+                </li>
+                <li class="nav-link">
+                    <a href="{% url 'perfils' %}">Perfils</a>
+                </li>
+                <li class="nav-link  login-btn">
+                    <a href="{% url 'login' %}" class="fas fa-sign-in-alt"></a>
+                </li>            
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        function toggleMenu(id) {
+            var menu = document.getElementById(id);
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        }
+        window.onclick = function(event) {
+            if (!event.target.matches('.nav-link a, .fas.fa-sign-in-alt')) {
+                var dropdowns = document.getElementsByClassName("dropdown-menu");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === "block") {
+                        openDropdown.style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

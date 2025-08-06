@@ -4,11 +4,10 @@ from django.conf.urls import handler404, handler500, handler403
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .views import logout_confirm,register,trigger_error, login, perfil_generico, resend_verification_email, verify_email, editar_perfil, error_404_view, autorizado_list_view, error_500_view, logout_view, autorizacao_acesso, delete_profile, permission_denied_view, remover_autorizacao
+from .views import perfils, objetivo, landing_page, logout_confirm,register,trigger_error, login, perfil_generico, resend_verification_email, verify_email, editar_perfil, error_404_view, autorizado_list_view, error_500_view, logout_view, autorizacao_acesso, delete_profile, permission_denied_view, remover_autorizacao
 
 
 urlpatterns = [
-    path('', views.index, name='index'),
     path('register/', register, name='register'),
     path('login/', login, name='login'),
     path('logout/', logout_view, name='logout'),
@@ -19,7 +18,9 @@ urlpatterns = [
     path('assign_role/', views.assign_role, name='assign_role'),
     path('verify/<uuid:token>/', verify_email, name='verify_email'),
     path('resend-verification-email/', resend_verification_email, name='resend_verification_email'),
-
+    path('', landing_page, name='landing_page'),
+    path('objetivo/', objetivo, name='objetivo'),
+    path('perfils/', perfils, name='perfils'),
     path('remover_autorizacao/<int:autorizacao_id>/', remover_autorizacao, name='remover_autorizacao'),
     path('autorizacao_acesso/<int:paciente_id>/', autorizacao_acesso, name='autorizacao_acesso'),
     path('autorizados/<int:paciente_id>/', autorizado_list_view, name='autorizado_list'),

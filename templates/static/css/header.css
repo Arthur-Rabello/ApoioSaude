@@ -1,76 +1,56 @@
-/* header.css */
-
+/* === NAVBAR === */
 .navbar {
+    background-color: #232EB8;
+    padding: 0.8rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    background-color: #232EB8;
-    position: relative; /* para posicionar dropdowns e hamburger */
+    position: relative;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.navbar .menu {
+/* LOGO */
+.navbar img.img1 {
+    width: 42px;
+    height: auto;
+    margin-right: 1rem;
+}
+
+/* LISTA DE LINKS */
+.nav-list {
     display: flex;
     align-items: center;
-}
-
-.navbar .menu li {
+    gap: 1.5rem;
     list-style: none;
-    margin: 0 10px;
-}
-
-.navbar .menu li a {
-    color: white;
-    text-decoration: none;
-    padding: 5px 10px;
-    transition: background-color 0.3s;
-}
-
-.navbar .menu li a:hover {
-    background-color: #3A43BF;
-    border-radius: 5px;
-}
-
-.navbar .user-icon {
-    position: absolute;
-    right: 90px;
-}
-
-.nav-list {
-    list-style: none;
-    display: flex;
     margin: 0;
     padding: 0;
-    margin-left: 120px;
 }
 
-.nav-link {
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
+/* LINKS NORMAIS */
 .nav-link a {
-    color: white;
+    color: #fff;
     text-decoration: none;
-    border-radius: 5px;
-    font-size: 20px;
-    transition: background-color 0.3s;
+    font-size: 1.1rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
 }
 
-.img1 {
-    width: 45px;
-    height: auto;
-    display: flex;
-    margin-right: 30px;
-}
-
-.nav-link:hover {
+.nav-link a:hover {
     background-color: #3A43BF;
 }
 
+/* LOGIN FIXO */
+.login-btn {
+    position: fixed;
+    top: 14px;
+    right: 24px;
+    font-size: 1.3rem;
+    background-color: transparent;
+}
+
+/* === DROPDOWN MENU (se tiver) === */
 .dropdown-menu {
     display: none;
     position: absolute;
@@ -88,96 +68,54 @@
     text-decoration: none;
     display: block;
     border-bottom: 1px solid #ddd;
-    font-size: 18px;
-    transition: background-color 0.3s;
+    font-size: 1rem;
 }
 
 .dropdown-menu a:hover {
-    background-color: #ddd;
+    background-color: #eee;
 }
 
-/* === MENU HAMBURGUER === */
-
+/* === MOBILE === */
 .hamburger {
-    display: none; /* escondido por padrão */
-    font-size: 30px;
+    display: none;
+    font-size: 1.8rem;
     color: white;
     cursor: pointer;
-    user-select: none;
 }
 
-/* para garantir que nav-list fica acima do conteúdo */
-.nav-list.active {
-    display: flex !important;
-    flex-direction: column;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    width: 100%;
-    background-color: #232EB8;
-    border-radius: 0 0 8px 8px;
-    padding: 0;
-    margin: 0;
-    z-index: 1100;
-}
-
-/* dropdowns ajustados no mobile */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     .nav-list {
-        display: none !important;
         flex-direction: column;
-        width: 100%;
-        margin-left: 0;
-        margin-top: 0;
-        background-color: #232EB8;
         position: absolute;
-        top: 60px;
+        top: 100%;
         left: 0;
-        border-radius: 0 0 8px 8px;
-        padding: 0;
-        z-index: 1100;
+        width: 100%;
+        background-color: #232EB8;
+        display: none;
+        padding: 1rem 0;
+    }
+
+    .nav-list.active {
+        display: flex;
+    }
+
+    .nav-link {
+        width: 100%;
+        text-align: center;
+    }
+
+    .nav-link a {
+        display: block;
+        padding: 1rem;
     }
 
     .hamburger {
         display: block;
     }
 
-    .nav-link {
-        width: 100%;
-        padding: 15px;
-        border-bottom: 1px solid rgba(255,255,255,0.2);
-        font-size: 18px;
-    }
-
-    .nav-link a {
-        font-size: 18px;
-        display: block;
-        width: 100%;
-        padding: 10px 0;
-    }
-
-    .img1 {
-        margin-right: 10px;
-        width: 35px;
-    }
-
-    /* Ajustar dropdowns para ocuparem a largura total no mobile */
-    .dropdown-menu {
-        position: static;
-        box-shadow: none;
-        background-color: #1c288a;
-        border-radius: 0;
-        min-width: 100%;
-        padding-left: 10px;
-        margin-bottom: 10px;
-    }
-    .dropdown-menu a {
-        color: white;
-        font-size: 16px;
-        border-bottom: none;
-        padding: 8px 0;
-    }
-    .dropdown-menu a:hover {
-        background-color: #3A43BF;
+    .login-btn {
+        position: absolute;
+        top: 12px;
+        right: 1rem;
     }
 }

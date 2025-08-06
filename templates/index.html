@@ -74,7 +74,7 @@
                                     {% else %}
                                         <img src="{% static 'img/default_profile.jpg' %}" alt="Sem foto" class="mini-profile-pic">
                                     {% endif %}
-                                    <p>{{ data.paciente.nome }}</p>
+                                    <p>{{ data.paciente.nome|truncatechars:14 }}</p>
                                 </div>
                             {% endfor %}
                             <div class="mini-add-patient-card" id="add-patient-card">
@@ -122,222 +122,174 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var selectedPatientId = localStorage.getItem('selectedPatient');
-            var currentPatientIndex = 0;
-            var patients = document.querySelectorAll('.patient-card');
-            var miniPatientCards = document.querySelectorAll('.mini-patient-card, .mini-add-patient-card');
-            var miniAddPatientCard = document.querySelector('.mini-add-patient-card');
-            var miniCardsWrapper = document.querySelector('.mini-cards-wrapper');
-            var notesContainer = document.getElementById('notes-container');
-            var medicationsContainer = document.getElementById('medications-container');
-            var calendarEl = document.getElementById('calendar');
-            var cardsToShow = 2;
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const miniCards = document.querySelectorAll('.mini-patient-card');
+        const addCard = document.querySelector('.mini-add-patient-card');
+        const allCards = [...miniCards, addCard];
+        const patients = document.querySelectorAll('.patient-card');
+        const notesContainer = document.getElementById('notes-container');
+        const medicationsContainer = document.getElementById('medications-container');
+        const calendarEl = document.getElementById('calendar');
+        let currentIndex = 0;
+        let selectedPatientId = localStorage.getItem('selectedPatient');
 
-            function renderPatient(index) {
-                patients.forEach(function(patient, idx) {
-                    if (idx === index) {
-                        patient.style.display = 'flex'; // Altere para 'flex' para usar flexbox
-                        renderNotes(patient);
-                        renderMedications(patient);
-                        renderCalendar(patient);
-                    } else {
-                        patient.style.display = 'none';
-                    }
-                });
-                updateAuthorizationLink(index);
-                updateAuthorizationList(index);
-                hideCurrentMiniCard(index);
-                showCards();
-            }
-
-            function renderNotes(patient) {
-                var notes = patient.querySelectorAll('.patient-notes li');
-                notesContainer.innerHTML = '';
-                var now = moment();
-                notes.forEach(function(note) {
-                    var noteDateTime = note.textContent.split(' - ')[0];
-                    var noteMoment = moment(noteDateTime, "DD/MM/YYYY HH:mm");
-                    if (now.diff(noteMoment, 'days') <= 2) { // Verifica se a nota está dentro dos últimos 2 dias
-                        var noteItem = document.createElement('div');
-                        noteItem.classList.add('note-item');
-        
-                        var noteTitle = document.createElement('div');
-                        noteTitle.classList.add('note-title');
-                        var author = note.dataset.autor; // Obtém o autor da nota
-                        noteTitle.textContent = author; // Define o título da nota com o autor
-        
-                        var noteContent = document.createElement('div');
-                        noteContent.classList.add('note-content');
-                        var content = note.textContent.split(' - ')[1]; // Pega o conteúdo da nota
-                        noteContent.innerHTML = content; // Define o conteúdo da nota
-        
-                        var noteTime = document.createElement('div');
-                        noteTime.classList.add('note-time');
-                        noteTime.textContent = noteMoment.format("DD/MM - HH:mm"); // Formata o horário
-        
-                        noteItem.appendChild(noteTitle);
-                        noteItem.appendChild(noteContent);
-                        noteItem.appendChild(noteTime);
-                        notesContainer.appendChild(noteItem);
-                    }
-                });
-            }
-
-            function renderMedications(patient) {
-                var medications = patient.querySelectorAll('.patient-medications li');
-                medicationsContainer.innerHTML = '';
-        
-                medications.forEach(function(medication, index) {
-                    var clonedMedication = medication.cloneNode(true);
-                    clonedMedication.classList.add('medication-item');
-        
-                    if (index < medications.length - 1) {
-                        clonedMedication.style.borderBottom = '1px solid #ccc';
-                    }
-        
-                    medicationsContainer.appendChild(clonedMedication);
-                });
-            }
-        
-            function renderCalendar(patient) {
-                var events = [];
-                patient.querySelectorAll('.patient-consultas li').forEach(function(event) {
-                    events.push({
-                        title: event.dataset.title,
-                        start: event.dataset.start,
-                        allDay: false
-                    });
-                });
-        
-                var calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'dayGridMonth',
-                    locale: 'pt-br',
-                    headerToolbar: {
-                        left: 'dayGridMonth,timeGridWeek,timeGridDay',
-                        center: 'title',
-                        right: 'today prev,next'
-                    },
-                    buttonText: {
-                        today: 'Hoje',
-                        month: 'Mês',
-                        week: 'Semana',
-                        day: 'Dia'
-                    },
-                    titleFormat: {
-                        month: 'long',
-                        year: 'numeric'
-                    },
-                    events: events,
-                    eventClick: function(info) {
-                        var formattedDate = moment(info.event.start).format('DD/MM/YYYY');
-                        var formattedTime = new Date(info.event.start).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                        alert(info.event.title + '\nData: ' + formattedDate + '\nHora: ' + formattedTime);
-                    },
-                });
-                calendar.render();
-            }
-
-            function updateAuthorizationLink(index) {
-                var patientId = patients[index].dataset.pacienteId;
-                var link = document.getElementById('autorizacao-link');
-                link.href = "{% url 'autorizacao_acesso' '0' %}".replace('0', patientId);
-            }
-
-            function updateAuthorizationList(index) {
-                var patientId = patients[index].dataset.pacienteId;
-                var link = document.getElementById('autorizacao-list');
-                link.href = "{% url 'autorizado_list' '0' %}".replace('0', patientId);
-            }
-
-            function hideCurrentMiniCard(index) {
-                miniPatientCards.forEach(function(card) {
-                    if (patients[index].dataset.pacienteId === card.dataset.pacienteId) {
-                        card.style.display = 'none';
-                    } else {
-                        card.style.display = 'flex';
-                    }
-                });
-            }
-
-            function showCards() {
-                let cardsShown = 0;
-                miniPatientCards.forEach(function(card, idx) {
-                    if (patients[currentPatientIndex].dataset.pacienteId === card.dataset.pacienteId) {
-                        card.style.display = 'none';
-                    } else {
-                        if (cardsShown >= currentCardIndex && cardsShown < currentCardIndex + cardsToShow) {
-                            card.style.display = 'flex';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                        cardsShown++;
-                    }
-                });
-            }
-
-            function showNextCards() {
-                if (currentCardIndex + cardsToShow < miniPatientCards.length - 1) {
-                    currentCardIndex++;
+        function renderPatientById(patientId) {
+            patients.forEach(function (patient) {
+                if (patient.dataset.pacienteId === patientId) {
+                    patient.style.display = 'flex';
+                    renderNotes(patient);
+                    renderMedications(patient);
+                    renderCalendar(patient);
+                    updateAuthorizationLink(patient);
+                    updateAuthorizationList(patient);
                 } else {
-                    currentCardIndex = 0;
-                }
-                showCards();
-            }
-
-            function showPreviousCards() {
-                if (currentCardIndex > 0) {
-                    currentCardIndex--;
-                } else {
-                    currentCardIndex = miniPatientCards.length - cardsToShow - 1;
-                }
-                showCards();
-            }
-
-            document.getElementById('next-patient').addEventListener('click', showNextCards);
-            document.getElementById('previous-patient').addEventListener('click', showPreviousCards);
-
-            miniPatientCards.forEach(function(card) {
-                if (!card.classList.contains('mini-add-patient-card')) {
-                    card.addEventListener('click', function() {
-                        localStorage.setItem('selectedPatient', card.dataset.pacienteId);
-                        currentPatientIndex = Array.from(patients).findIndex(patient => patient.dataset.pacienteId === card.dataset.pacienteId);
-                        renderPatient(currentPatientIndex);
-                    });
+                    patient.style.display = 'none';
                 }
             });
+        }
 
-            if (selectedPatientId) {
-                currentPatientIndex = Array.from(patients).findIndex(patient => patient.dataset.pacienteId === selectedPatientId);
-                if (currentPatientIndex !== -1) {
-                    renderPatient(currentPatientIndex);
-                } else {
-                    
-                    currentPatientIndex = 0;
-                    if (patients.length > 0) {
-                        selectedPatientId = patients[0].dataset.pacienteId;
-                        localStorage.setItem('selectedPatient', selectedPatientId);
-                    }
-                    renderPatient(currentPatientIndex);
+        function renderNotes(patient) {
+            const notes = patient.querySelectorAll('.patient-notes li');
+            notesContainer.innerHTML = '';
+            const now = moment();
+            notes.forEach(function (note) {
+                const noteDateTime = note.textContent.split(' - ')[0];
+                const noteMoment = moment(noteDateTime, "DD/MM/YYYY HH:mm");
+                if (now.diff(noteMoment, 'days') <= 2) {
+                    const noteItem = document.createElement('div');
+                    noteItem.classList.add('note-item');
+
+                    const noteTitle = document.createElement('div');
+                    noteTitle.classList.add('note-title');
+                    const author = note.dataset.autor;
+                    noteTitle.textContent = author;
+
+                    const noteContent = document.createElement('div');
+                    noteContent.classList.add('note-content');
+                    const content = note.textContent.split(' - ')[1];
+                    noteContent.innerHTML = content;
+
+                    const noteTime = document.createElement('div');
+                    noteTime.classList.add('note-time');
+                    noteTime.textContent = noteMoment.format("DD/MM - HH:mm");
+
+                    noteItem.appendChild(noteTitle);
+                    noteItem.appendChild(noteContent);
+                    noteItem.appendChild(noteTime);
+                    notesContainer.appendChild(noteItem);
                 }
-            } else {
-                currentPatientIndex = 0;
-                if (patients.length > 0) {
-                    selectedPatientId = patients[0].dataset.pacienteId;
-                    localStorage.setItem('selectedPatient', selectedPatientId);
+            });
+        }
+
+        function renderMedications(patient) {
+            const medications = patient.querySelectorAll('.patient-medications li');
+            medicationsContainer.innerHTML = '';
+            medications.forEach(function (medication, index) {
+                const cloned = medication.cloneNode(true);
+                cloned.classList.add('medication-item');
+                if (index < medications.length - 1) {
+                    cloned.style.borderBottom = '1px solid #ccc';
                 }
-                renderPatient(currentPatientIndex);
+                medicationsContainer.appendChild(cloned);
+            });
+        }
+
+        function renderCalendar(patient) {
+            const events = [];
+            patient.querySelectorAll('.patient-consultas li').forEach(function (event) {
+                events.push({
+                    title: event.dataset.title,
+                    start: event.dataset.start,
+                    allDay: false
+                });
+            });
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'pt-br',
+                headerToolbar: {
+                    left: 'dayGridMonth,timeGridWeek,timeGridDay',
+                    center: 'title',
+                    right: 'today prev,next'
+                },
+                buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia'
+                },
+                titleFormat: { month: 'long', year: 'numeric' },
+                events: events,
+                eventClick: function (info) {
+                    const formattedDate = moment(info.event.start).format('DD/MM/YYYY');
+                    const formattedTime = new Date(info.event.start).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    alert(info.event.title + '\nData: ' + formattedDate + '\nHora: ' + formattedTime);
+                }
+            });
+            calendar.render();
+        }
+
+        function updateAuthorizationLink(patient) {
+            const patientId = patient.dataset.pacienteId;
+            const link = document.getElementById('autorizacao-link');
+            if (link) link.href = "{% url 'autorizacao_acesso' '0' %}".replace('0', patientId);
+        }
+
+        function updateAuthorizationList(patient) {
+            const patientId = patient.dataset.pacienteId;
+            const link = document.getElementById('autorizacao-list');
+            if (link) link.href = "{% url 'autorizado_list' '0' %}".replace('0', patientId);
+        }
+
+        function updateVisibleCards() {
+            allCards.forEach((card, index) => {
+                card.style.display = (index >= currentIndex && index < currentIndex + 2) ? 'flex' : 'none';
+            });
+        }
+
+        document.getElementById('previous-patient').addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateVisibleCards();
             }
-
         });
 
-        $(document).ready(function() {
-            $('#add-patient-card').click(function(event) {
-                event.preventDefault();
-                window.location.href = $(this).find('a').attr('href');
+        document.getElementById('next-patient').addEventListener('click', () => {
+            if (currentIndex < allCards.length - 2) {
+                currentIndex++;
+                updateVisibleCards();
+            }
+        });
+
+        allCards.forEach(card => {
+            card.addEventListener('click', function () {
+                const patientId = this.getAttribute('data-paciente-id');
+                if (patientId) {
+                    localStorage.setItem('selectedPatient', patientId);
+                    renderPatientById(patientId);
+                }
             });
         });
-    </script>
+
+        if (!selectedPatientId && miniCards.length > 0) {
+            selectedPatientId = miniCards[0].getAttribute('data-paciente-id');
+            localStorage.setItem('selectedPatient', selectedPatientId);
+        }
+
+        if (selectedPatientId) {
+            renderPatientById(selectedPatientId);
+        }
+
+        updateVisibleCards();
+    });
+
+    $(document).ready(function () {
+        $('#add-patient-card').click(function (event) {
+            event.preventDefault();
+            window.location.href = $(this).find('a').attr('href');
+        });
+    });
+</script>
+
 </body>
 </html>

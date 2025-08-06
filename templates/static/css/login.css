@@ -2,12 +2,15 @@ body {
     display: flex;
     align-items: center;
     height: 100vh;
-    background-image: url("/static/img/fundo.jpg");
-    background-size: cover;
-    background-repeat: no-repeat;
     margin: 0;
     font-family: 'Roboto', sans-serif;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+                url("/static/img/ChatGPT Image Aug 5, 2025, 08_50_23 PM.png") center center no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
 }
+
+
 
 .login-container {
     display: flex;

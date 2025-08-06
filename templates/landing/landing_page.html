@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApoioSaúde</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet'>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/pt-br.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo.png' %}">
+</head>
+
+{% include 'common/base.html' %}
+
+<body>
+  <section class="sobre-container">
+    <div class="sobre-block fade-in">
+      <h2>Sobre o Sistema</h2>
+      <p>O ApoioSaúde é uma plataforma inovadora desenvolvida para facilitar o acesso a serviços de saúde, conectando pacientes, médicos e cuidadores de forma simples e eficiente.</p>
+      <img src="{% static 'img/imagem_telainicial.png' %}" alt="Imagem sobre o sistema" class="sobre-image">
+      <p>Nosso objetivo é fornecer um sistema acessível para todos, com foco na personalização de cuidados e integração entre diferentes perfis de usuários.</p>
+    </div>
+    
+  </section>
+</body>
+
+</html>

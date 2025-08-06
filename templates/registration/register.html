@@ -99,7 +99,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function getFamiliarForm() {
         return `
-           {% for field in familiar_form %}
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            {% for field in familiar_form %}
                <div class="form-group">
                    {{ field.label_tag }} {{ field }}
                    {% if field.help_text %}
@@ -115,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function getMedicoForm() {
         return `
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             {% for field in medico_form %}
                 <div class="form-group">
                     {{ field.label_tag }} {{ field }}

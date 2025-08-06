@@ -14,6 +14,14 @@ from .mixins import FamiliarRequiredMixin, CuidadorFamiliarRequiredMixin, AdminR
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Paciente, Familiar, Medico, Medicamento, NotaObservacao, Consulta, CustomUser, Autorizacao
 from .forms import ConsultaForm, ConsultaForm, PacienteForm, CustomUserCreationForm, FamiliarRegisterForm, MedicoRegisterForm, MedicamentoForm
+from django.contrib.auth.views import PasswordResetView
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.contrib.sites.shortcuts import get_current_site
+from django.conf import settings
+import logging
+
 
 
 User = get_user_model()
@@ -92,8 +100,19 @@ def login(request):
             messages.error(request, 'Usuário ou senha inválidos.')
     return render(request, 'registration/login.html')
 
+def landing_page(request):
+    return render(request, 'landing/landing_page.html')
+
+# View para a página Objetivo
+def objetivo(request):
+    return render(request, 'landing/objetivo.html')
+    
+def perfils(request):
+    return render(request, 'landing/perfils.html')
+    
 @login_required
 def index(request):
+    
     user_type = request.user.user_type
     is_familiar_admin = getattr(request.user, 'is_familiar_admin', False)
 
@@ -847,3 +866,79 @@ def resend_verification_email(request):
             messages.error(request, 'Usuário não encontrado.')
         return redirect('login')
     return render(request, 'registration/resend_verification_email.html')
+logger = logging.getLogger(__name__)
+
+class CustomPasswordResetView(PasswordResetView):
+    """
+    View personalizada para reset de senha com email HTML
+    """
+    template_name = 'registration/password_reset_form.html'
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    
+    def send_mail(self, subject_template_name, email_template_name,
+                  context, from_email, to_email, html_email_template_name=None):
+        """
+        Sobrescreve o método send_mail para enviar HTML
+        """
+        try:
+            # Renderizar assunto
+            subject = render_to_string(subject_template_name, context)
+            subject = ''.join(subject.splitlines())  # Remove quebras de linha
+            
+            # Renderizar conteúdo HTML
+            html_content = render_to_string(email_template_name, context)
+            
+            # Criar versão texto (fallback)
+            text_content = strip_tags(html_content)
+            
+            # Criar email com HTML
+            email = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=from_email,
+                to=[to_email]
+            )
+            
+            # Anexar versão HTML
+            email.attach_alternative(html_content, "text/html")
+            
+            # Enviar
+            email.send()
+            
+            logger.info(f"Email de reset enviado para: {to_email}")
+            
+        except Exception as e:
+            logger.error(f"Erro ao enviar email: {str(e)}")
+            raise
+
+
+# Função auxiliar para envio manual de email HTML
+def send_custom_html_email(subject, html_template, context, to_email):
+    """
+    Função para enviar email HTML personalizado
+    """
+    try:
+        # Renderizar HTML
+        html_content = render_to_string(html_template, context)
+        text_content = strip_tags(html_content)
+        
+        # Criar email
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=text_content,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[to_email]
+        )
+        
+        # Anexar HTML
+        email.attach_alternative(html_content, "text/html")
+        
+        # Enviar
+        email.send()
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Erro ao enviar email HTML: {str(e)}")
+        return False

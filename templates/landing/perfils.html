@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApoioSaúde - Perfis de Usuário</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet'>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/pt-br.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo.png' %}">
+</head>
+<body>
+    {% include 'common/base.html' %}
+
+    <div class="profile-container">
+        <!-- Bloco Cuidador -->
+        <section class="profile-block">
+            <h2>Perfil Cuidador</h2>
+            <p>O <strong>cuidador</strong> tem como principal função acompanhar os pacientes, monitorar seu estado de saúde, ajudar nas tarefas diárias e garantir que as recomendações médicas sejam seguidas.</p>
+            <p>Como cuidador, você terá acesso a informações essenciais sobre o paciente e poderá se comunicar com médicos e familiares diretamente pelo sistema.</p>
+            
+        </section>
+
+        <!-- Bloco Familiar -->
+        <section class="profile-block">
+            <h2>Perfil Familiar</h2>
+            <p>Como <strong>familiar</strong>, você terá acesso ao histórico de saúde do paciente, podendo acompanhar suas consultas e tratamentos, bem como interagir diretamente com médicos e cuidadores.</p>
+            <p>Além disso, poderá autorizar o acesso de outros usuários ao perfil do paciente, garantindo uma gestão colaborativa da saúde.</p>
+            
+        </section>
+
+        <!-- Bloco Médico -->
+        <section class="profile-block">
+            <h2>Perfil Médico</h2>
+            <p>O <strong>médico</strong> tem acesso completo ao histórico médico do paciente e realizar o acompanhamento remoto dos pacientes.</p>
+            <p>Além disso, o médico pode se comunicar com cuidadores e familiares, garantindo uma gestão integrada do cuidado à saúde do paciente.</p>
+           
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 ApoioSaúde - Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>

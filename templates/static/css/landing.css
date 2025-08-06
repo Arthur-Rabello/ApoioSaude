@@ -1,0 +1,300 @@
+html, body {
+    height: 100%; /* Garantir que o body ocupe toda a altura da tela */
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #007BFF;
+    color: white;
+    height: 100%;
+}
+
+main {
+    flex-grow: 1; /* Faz o conteúdo principal ocupar o espaço restante */
+}
+
+
+header {
+    background-color:rgb(29, 100, 175);
+    text-align: center;
+    padding: 5px 10px;
+}
+header h1 {
+    font-size: 1.5em;
+}
+
+header p {
+    color: white;
+
+}
+
+section {
+    padding: 20px;
+    margin: 20px;
+    text-align: center;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+h2 {
+    color: white;
+}
+p, ul {
+    font-size: 1.1em;
+    color: white;
+}
+.cta-btn {
+    display: inline-block;
+    background-color: white;
+    color: #007BFF;
+    padding: 12px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+.cta-btn:hover {
+   filter: brightness(85%);
+}
+
+.profile-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 30px 0;
+    padding: 0 20px;
+    flex-wrap: wrap; /* Para garantir que os blocos se ajustem em telas menores */
+}
+
+/* Bloco de cada perfil */
+.profile-block {
+    background-color: rgba(104, 110, 116, 0.78);
+    padding: 20px;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 30%; /* Largura dos blocos */
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .profile-block {
+        width: 100%; /* Em telas menores, os blocos ocupam 100% da largura */
+    }
+}
+
+footer {
+    background-color: #007BFF;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    margin-top: 30px;
+}
+
+.sobre-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background-color: #007bff; /* mesmo azul do fundo */
+}
+
+.sobre-block {
+    background-color: rgba(104, 110, 116, 0.78);
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+    color: white;
+}
+
+.sobre-block h2 {
+    margin-bottom: 15px;
+}
+
+.sobre-block p {
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+.sobre-image {
+    display: block;
+    max-width: 600px;
+    width: 100%;
+    height: auto;
+    margin: 0 auto; /* Centraliza horizontalmente */
+    border-radius: 8px;
+}
+
+
+.objetivo-block {
+    background-color: rgba(104, 110, 116, 0.78);
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Ocupa toda a largura */
+    box-sizing: border-box;
+    text-align: center;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #007BFF;
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+.sobre-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: #007BFF;
+}
+
+.sobre-block {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 2rem 1rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    max-width: 960px;
+    width: 100%;
+    text-align: center;
+    backdrop-filter: blur(6px);
+}
+
+.sobre-block h2 {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+}
+
+.sobre-block p {
+    font-size: clamp(1rem, 1.8vw, 1.15rem);
+    color: #f1f1f1;
+    margin: 1.2rem 0;
+}
+
+.sobre-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    margin: auto;
+    border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+    .sobre-block {
+        padding: 2rem 1rem;
+    }
+
+    .sobre-image {
+        max-width: 100%;
+    }
+}
+
+.objetivo-block {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 3rem 2rem;
+    margin: 4rem auto;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    max-width: 960px;
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.8s ease-out;
+}
+
+.objetivo-block h2 {
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+
+}
+
+.objetivo-block p {
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    line-height: 1.8;
+    color: #e6e6e6;
+    margin: 0 auto;
+    max-width: 90%;
+}
+.fade-in {
+    animation: fadeIn 0.8s ease-out;
+}
+
+
+/* Animação suave de entrada */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.profile-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    padding: 4rem 1rem;
+}
+
+.profile-block {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    width: 300px;
+    max-width: 90%;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.8s ease-out;
+}
+
+.profile-block:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.profile-block h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.profile-block p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 0.75rem 0;
+}
+
+/* Animações de entrada com delay */
+.profile-block:nth-child(1) { animation-delay: 0.1s; }
+.profile-block:nth-child(2) { animation-delay: 0.3s; }
+.profile-block:nth-child(3) { animation-delay: 0.5s; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+footer {
+    background-color: transparent;
+    color: white;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.95rem;
+}

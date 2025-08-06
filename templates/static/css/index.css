@@ -1,12 +1,12 @@
-body {
-    font-family: 'Arial', sans-serif;
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
     background-image: url("/static/img/fundo_tela.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    margin: 0;
-    padding: 0;
-    
+    font-family: 'Arial', sans-serif;
 }
 
 header {
@@ -180,18 +180,19 @@ header {
 }
 
 .mini-patient-card {
-    background-color: #49D3B2; /* Gray background for cards */
+    background-color: #49D3B2;
     border-radius: 20px;
-    justify-content: center;
-    width: 200px; /* Adjusted width */
-    height: 90px; /* Adjusted height */
     display: flex;
     align-items: center;
-    padding: 5px;
+    text-align: center;
+    padding: 10px;
+    width: 200px;
+    height: 90px;
     text-decoration: none;
-    margin: 0 auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .mini-add-patient-card {
@@ -210,17 +211,22 @@ header {
 
 
 .mini-patient-card img {
+    flex-shrink: 0;
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    margin-right: 30px;
+    width: 50px;
+    height: 50px;
+    margin auto;
 }
 
+
 .mini-patient-card p {
-    font-size: 18px;
-    margin: 0;
+    font-size: 16px;
     font-weight: bold;
+    margin: auto;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
+
 
 .mini-add-patient-card a {
     text-decoration: none;
@@ -307,10 +313,10 @@ header {
 .row {
     padding: 18px;
     align-items: space-between;
+    flex-wrap: nowrap;
     flex: 1;
     display: flex;
     gap: 20px;
-    flex-wrap: wrap;
     margin: 10px -20px;
 }
 
@@ -431,4 +437,23 @@ header {
 
 .no-patients-message a:hover {
     background-color: #3A43BF;
+}
+
+
+/* Esconde a seção de calendário e notas se o usuário for médico */
+body.medico .box:nth-child(1),
+body.medico .carousel-container:nth-of-type(2) {
+    display: none;
+}
+
+/* Ajusta para médicos: layout lado a lado */
+body.medico .row {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+body.medico .carousel-container,
+body.medico .box {
+    width: 48%;
+    margin: 0;
 }
