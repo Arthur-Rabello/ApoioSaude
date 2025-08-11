@@ -2,7 +2,7 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-image: url("/static/img/fundo_tela.jpg");
+    background-image: url("/static/img/tela_de_fundo.png");
     background-size: cover;
     color: #333;
     margin: 0;

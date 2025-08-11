@@ -40,13 +40,14 @@
                     <a href="{% url 'consulta_create'%}">Criar nova consulta</a>
                 </div>
             </li>
-            <li class="nav-link" style="margin-left: 600px;">
+            <li class="nav-link login-btn">
                 <a href="#" onclick="toggleMenu('perfil-menu')" class="fas fa-user"></a>
-                <div id="perfil-menu" class="dropdown-menu" >
-                    <a href="{% url 'perfil_generico' user.id %}" >Mostrar perfil</a>
+                <div id="perfil-menu" class="dropdown-menu">
+                    <a href="{% url 'perfil_generico' user.id %}">Mostrar perfil</a>
                     <a href="{% url 'logout_confirm' %}">Sair</a>
                 </div>
-            </li>
+                </li>
+
         </ul>
     </nav>
 </div>

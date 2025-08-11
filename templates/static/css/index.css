@@ -2,7 +2,7 @@ html, body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    background-image: url("/static/img/fundo_tela.jpg");
+    background-image: url("/static/img/tela_de_fundo.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
